@@ -5,6 +5,7 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   ANTHROPIC_API_KEY: z.string().min(1),
+  UPLOAD_DIR: z.string().min(1).default("uploads"),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

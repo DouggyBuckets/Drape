@@ -1,8 +1,15 @@
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { pool } from "./db/pool.js";
+import { extractAttributes } from "./extraction/extract.js";
 
-const server = createApp({ db: pool }).listen(env.PORT, () => {
+const app = createApp({
+  db: pool,
+  extractor: (photo) => extractAttributes(photo),
+  uploadDir: env.UPLOAD_DIR,
+});
+
+const server = app.listen(env.PORT, () => {
   console.log(`drape listening on http://localhost:${env.PORT}`);
 });
 
