@@ -1,0 +1,4 @@
+# Copy to eval/labels.csv and add one row per photo in images/. See eval/LABELING.md.
+file,category,color,formality,warmth,seasons
+navy-coat.jpg,outerwear,navy,4,5,fall;winter
+white-tee.jpg,top,white,2,2,spring;summer;fall
