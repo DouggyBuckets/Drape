@@ -29,9 +29,14 @@ Use "drape" for the repo, package, and database names.
 - All env config goes through `src/config/env.ts` (Zod, fails fast). Don't read `process.env` elsewhere.
 - Schema changes are new numbered files in `migrations/` (`NNN_description.sql`); never edit an applied migration.
 - Check current Anthropic docs for API shapes rather than relying on memory.
+- Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
+- Tests never call the real API: inject a fake `Extractor` via `createApp` deps.
+- Evals: only `ExtractionError`s count as model failures; other errors abort the run.
 
 ## Commands
 - `npm run db:up` — start Postgres (host port 5433)
 - `npm run migrate` — apply pending migrations
 - `npm run dev` — run the server with reload
-- `npm test` — run tests
+- `npm test` — run tests (uses a separate `drape_test` database, created automatically)
+- `npm run eval:extraction` — extraction accuracy vs `eval/labels.csv` (calls the API; costs money)
+- `npm run labeling-guide` — regenerate `eval/LABELING.md` after editing `src/extraction/rubric.ts`
