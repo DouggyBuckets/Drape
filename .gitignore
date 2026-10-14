@@ -1,0 +1,14 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Personal photos — never commit
+images/
+uploads/
+
+# Build / deps
+node_modules/
+dist/
+coverage/
+*.log
