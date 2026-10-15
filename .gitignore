@@ -12,3 +12,6 @@ node_modules/
 dist/
 coverage/
 *.log
+
+# Windows metadata from copying files into WSL
+*:Zone.Identifier
