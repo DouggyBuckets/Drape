@@ -1,0 +1,234 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "promptVersion": "44cffb66d094",
+  "labelsFile": "eval/labels.dev.csv",
+  "ranAt": "2026-10-20T22:21:26.844Z",
+  "usage": {
+    "inputTokens": 21719,
+    "outputTokens": 354
+  },
+  "estimatedCostUsd": 0.093956,
+  "report": {
+    "total": 5,
+    "failed": 0,
+    "attributes": {
+      "category": {
+        "kind": "categorical",
+        "accuracy": 1
+      },
+      "color": {
+        "kind": "categorical",
+        "accuracy": 1
+      },
+      "formality": {
+        "kind": "ordinal",
+        "accuracy": 1,
+        "withinOne": 1,
+        "meanAbsError": 0
+      },
+      "warmth": {
+        "kind": "ordinal",
+        "accuracy": 0.4,
+        "withinOne": 1,
+        "meanAbsError": 0.6
+      },
+      "seasons": {
+        "kind": "set",
+        "accuracy": 0.6,
+        "meanJaccard": 0.8833333333333332
+      }
+    },
+    "mismatches": [
+      {
+        "file": "blue-button-down-shirt.jpg",
+        "attribute": "warmth",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "blue-button-down-shirt.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "blue-varsity-jacket.jpg",
+        "attribute": "warmth",
+        "expected": 4,
+        "predicted": 3
+      },
+      {
+        "file": "blue-varsity-jacket.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "winter",
+          "spring"
+        ],
+        "predicted": [
+          "spring",
+          "fall"
+        ]
+      },
+      {
+        "file": "pink-tennis-shoes.jpg",
+        "attribute": "warmth",
+        "expected": 3,
+        "predicted": 2
+      }
+    ],
+    "failures": []
+  },
+  "cases": [
+    {
+      "file": "blue-button-down-shirt.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 4,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "light blue long-sleeve dress shirt",
+        "category": "top",
+        "color": "blue",
+        "formality": 4,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "light blue short-sleeve textured knit open-collar polo",
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-varsity-jacket.jpg",
+      "label": {
+        "category": "outerwear",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 4,
+        "seasons": [
+          "fall",
+          "winter",
+          "spring"
+        ]
+      },
+      "prediction": {
+        "name": "royal blue Polo Ralph Lauren fleece varsity jacket with cream sleeves and tennis patches",
+        "category": "outerwear",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "grey-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "gray",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "light gray ribbed knit short-sleeve polo",
+        "category": "top",
+        "color": "gray",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "pink-tennis-shoes.jpg",
+      "label": {
+        "category": "shoes",
+        "color": "pink",
+        "formality": 1,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "hot pink ASICS Gel-Resolution tennis shoes",
+        "category": "shoes",
+        "color": "pink",
+        "formality": 1,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    }
+  ]
+}
