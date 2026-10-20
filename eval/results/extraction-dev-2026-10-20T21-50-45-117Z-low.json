@@ -1,0 +1,272 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "ranAt": "2026-10-20T21:50:45.118Z",
+  "usage": {
+    "inputTokens": 21349,
+    "outputTokens": 348
+  },
+  "estimatedCostUsd": 0.092356,
+  "report": {
+    "total": 5,
+    "failed": 0,
+    "attributes": {
+      "category": {
+        "kind": "categorical",
+        "accuracy": 1
+      },
+      "color": {
+        "kind": "categorical",
+        "accuracy": 1
+      },
+      "formality": {
+        "kind": "ordinal",
+        "accuracy": 0.8,
+        "withinOne": 1,
+        "meanAbsError": 0.2
+      },
+      "warmth": {
+        "kind": "ordinal",
+        "accuracy": 0.4,
+        "withinOne": 1,
+        "meanAbsError": 0.6
+      },
+      "seasons": {
+        "kind": "set",
+        "accuracy": 0,
+        "meanJaccard": 0.6166666666666666
+      }
+    },
+    "mismatches": [
+      {
+        "file": "blue-button-down-shirt.jpg",
+        "attribute": "warmth",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "blue-button-down-shirt.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "blue-polo.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      {
+        "file": "blue-varsity-jacket.jpg",
+        "attribute": "warmth",
+        "expected": 4,
+        "predicted": 3
+      },
+      {
+        "file": "blue-varsity-jacket.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "winter"
+        ],
+        "predicted": [
+          "spring",
+          "fall"
+        ]
+      },
+      {
+        "file": "grey-polo.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      {
+        "file": "pink-tennis-shoes.jpg",
+        "attribute": "formality",
+        "expected": 2,
+        "predicted": 1
+      },
+      {
+        "file": "pink-tennis-shoes.jpg",
+        "attribute": "warmth",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "pink-tennis-shoes.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      }
+    ],
+    "failures": []
+  },
+  "cases": [
+    {
+      "file": "blue-button-down-shirt.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 4,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "light blue long-sleeve dress shirt",
+        "category": "top",
+        "color": "blue",
+        "formality": 4,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "light blue short-sleeve knit polo",
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-varsity-jacket.jpg",
+      "label": {
+        "category": "outerwear",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 4,
+        "seasons": [
+          "fall",
+          "winter"
+        ]
+      },
+      "prediction": {
+        "name": "royal blue Polo Ralph Lauren fleece varsity jacket with cream sleeves and tennis patches",
+        "category": "outerwear",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "grey-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "gray",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "light gray ribbed knit short-sleeve polo",
+        "category": "top",
+        "color": "gray",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "pink-tennis-shoes.jpg",
+      "label": {
+        "category": "shoes",
+        "color": "pink",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "hot pink ASICS Gel-Resolution tennis shoes",
+        "category": "shoes",
+        "color": "pink",
+        "formality": 1,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    }
+  ]
+}
