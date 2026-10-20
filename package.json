@@ -16,7 +16,8 @@
     "db:down": "docker compose down",
     "migrate": "tsx src/db/migrate.ts",
     "eval:extraction": "tsx scripts/eval-extraction.ts",
-    "labeling-guide": "tsx scripts/write-labeling-guide.ts"
+    "labeling-guide": "tsx scripts/write-labeling-guide.ts",
+    "seed": "tsx scripts/seed-wardrobe.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.134.0",

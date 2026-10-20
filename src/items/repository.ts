@@ -62,6 +62,51 @@ export async function listItems(db: Queryable): Promise<WardrobeItem[]> {
   return rows.map(toItem);
 }
 
+export interface ItemFilters {
+  category?: ItemAttributes["category"];
+  colors?: ItemAttributes["color"][];
+  formalityMin?: number;
+  formalityMax?: number;
+  warmthMin?: number;
+  warmthMax?: number;
+  season?: ItemAttributes["seasons"][number];
+  nameContains?: string;
+  limit?: number;
+}
+
+/** Filtered wardrobe search. Values are always bound parameters, never interpolated. */
+export async function searchItems(db: Queryable, f: ItemFilters): Promise<WardrobeItem[]> {
+  const where: string[] = [];
+  const params: unknown[] = [];
+  const bind = (v: unknown) => `$${params.push(v)}`;
+
+  if (f.category) where.push(`category = ${bind(f.category)}`);
+  if (f.colors?.length) where.push(`color = ANY(${bind(f.colors)})`);
+  if (f.formalityMin !== undefined) where.push(`formality >= ${bind(f.formalityMin)}`);
+  if (f.formalityMax !== undefined) where.push(`formality <= ${bind(f.formalityMax)}`);
+  if (f.warmthMin !== undefined) where.push(`warmth >= ${bind(f.warmthMin)}`);
+  if (f.warmthMax !== undefined) where.push(`warmth <= ${bind(f.warmthMax)}`);
+  if (f.season) where.push(`${bind(f.season)} = ANY(seasons)`);
+  if (f.nameContains) where.push(`name ILIKE ${bind(`%${f.nameContains.replace(/[\\%_]/g, "\\$&")}%`)}`);
+
+  const sql = `SELECT ${COLUMNS} FROM wardrobe_items
+    ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+    ORDER BY category, formality, name
+    LIMIT ${bind(Math.min(f.limit ?? 25, 50))}`;
+  const { rows } = await db.query<Row>(sql, params);
+  return rows.map(toItem);
+}
+
+/** Looks up several items at once; missing ids are simply absent from the result. */
+export async function getItemsByIds(db: Queryable, ids: string[]): Promise<WardrobeItem[]> {
+  const valid = ids.filter((id) => UUID.test(id));
+  if (!valid.length) return [];
+  const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE id = ANY($1::uuid[])`, [valid]);
+  return rows.map(toItem);
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getItem(db: Queryable, id: string): Promise<WardrobeItem | null> {
   const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE id = $1`, [id]);
   return rows[0] ? toItem(rows[0]) : null;
