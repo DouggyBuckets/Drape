@@ -11,9 +11,13 @@ describe("parseLabelsCsv", () => {
     ]);
   });
 
-  it("reports every invalid row with its line number", () => {
-    const csv = `${HEADER}\na.jpg,top,teal,3,2,summer\nb.jpg,top,navy,6,2,summer\nc.jpg,top,navy,3`;
-    expect(() => parseLabelsCsv(csv)).toThrow(/row 2 \(a\.jpg\): color[\s\S]*row 3 \(b\.jpg\): formality[\s\S]*row 4: expected 6 columns/);
+  it("reports every invalid row with its file line number, counting comment lines", () => {
+    const csv = `# comment\n${HEADER}\na.jpg,top,teal,3,2,summer\nb.jpg,top,navy,6,2,summer\nc.jpg,top,navy,3`;
+    expect(() => parseLabelsCsv(csv)).toThrow(/line 3 \(a\.jpg\): color[\s\S]*line 4 \(b\.jpg\): formality[\s\S]*line 5: expected 6 columns/);
+  });
+
+  it("hints at the season separator when there are extra columns", () => {
+    expect(() => parseLabelsCsv(`${HEADER}\na.jpg,top,navy,3,2,spring,summer`)).toThrow(/line 2: .*separate seasons with ';'/);
   });
 
   it("rejects a wrong header", () => {

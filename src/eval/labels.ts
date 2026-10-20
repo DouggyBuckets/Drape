@@ -11,17 +11,22 @@ const LabelSchema = ItemAttributesSchema.omit({ name: true });
  * so a label typo fails loudly instead of silently lowering accuracy.
  */
 export function parseLabelsCsv(text: string): { file: string; label: Label }[] {
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
+  // Keep 1-based file line numbers so errors point at the line you'd edit.
+  const lines = text
+    .split(/\r?\n/)
+    .map((content, i) => ({ content: content.trim(), lineNo: i + 1 }))
+    .filter((l) => l.content && !l.content.startsWith("#"));
   const [header, ...rows] = lines;
-  if (header !== LABEL_COLUMNS.join(",")) {
+  if (header?.content !== LABEL_COLUMNS.join(",")) {
     throw new Error(`labels CSV header must be exactly: ${LABEL_COLUMNS.join(",")}`);
   }
 
   const errors: string[] = [];
-  const parsed = rows.flatMap((line, i) => {
-    const cells = line.split(",").map((c) => c.trim());
+  const parsed = rows.flatMap(({ content, lineNo }) => {
+    const cells = content.split(",").map((c) => c.trim());
     if (cells.length !== LABEL_COLUMNS.length) {
-      errors.push(`row ${i + 2}: expected ${LABEL_COLUMNS.length} columns, got ${cells.length}`);
+      const hint = cells.length > LABEL_COLUMNS.length ? " (separate seasons with ';', not ',')" : "";
+      errors.push(`line ${lineNo}: expected ${LABEL_COLUMNS.length} columns, got ${cells.length}${hint}`);
       return [];
     }
     const [file, category, color, formality, warmth, seasons] = cells as [string, ...string[]];
@@ -34,7 +39,7 @@ export function parseLabelsCsv(text: string): { file: string; label: Label }[] {
     });
     if (!result.success) {
       const why = result.error.issues.map((iss) => `${iss.path.join(".")}: ${iss.message}`).join("; ");
-      errors.push(`row ${i + 2} (${file}): ${why}`);
+      errors.push(`line ${lineNo} (${file}): ${why}`);
       return [];
     }
     return [{ file, label: result.data }];
