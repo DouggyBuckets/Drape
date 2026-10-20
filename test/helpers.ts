@@ -25,6 +25,9 @@ export function testApp(overrides: Partial<AppDeps> = {}) {
     db: pool,
     extractor: async () => sampleResult(),
     uploadDir: mkdtempSync(path.join(tmpdir(), "drape-test-")),
+    runAgent: async () => {
+      throw new Error("runAgent not stubbed for this test");
+    },
     ...overrides,
   });
 }
