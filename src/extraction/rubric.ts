@@ -32,6 +32,10 @@ export const FORMALITY_LEVELS: Record<1 | 2 | 3 | 4 | 5, string> = {
   5: "Formal — suits, tuxedos, evening gowns, patent dress shoes",
 };
 
+export const FORMALITY_NOTES =
+  "Shoes: running/tennis/gym shoes → 1; everyday canvas or casual sneakers → 2; " +
+  "clean minimal leather sneakers, loafers, boat shoes → 3; dress shoes → 4–5.";
+
 export const WARMTH_LEVELS: Record<1 | 2 | 3 | 4 | 5, string> = {
   1: "Very light — tank tops, linen, shorts, sandals; for hot weather (above ~80°F / 27°C)",
   2: "Light — t-shirts, thin shirts, light dresses, canvas sneakers (~65–80°F / 18–27°C)",

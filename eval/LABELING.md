@@ -40,6 +40,7 @@ The single dominant color by visible area. Use 'multi' only when no color covers
 - 3: Smart casual — polos, button-downs, chinos, knit sweaters, clean leather sneakers, loafers
 - 4: Business — dress shirts, tailored trousers, blazers, dress shoes, sheath dresses
 - 5: Formal — suits, tuxedos, evening gowns, patent dress shoes
+Shoes: running/tennis/gym shoes → 1; everyday canvas or casual sneakers → 2; clean minimal leather sneakers, loafers, boat shoes → 3; dress shoes → 4–5.
 
 ### warmth (1–5)
 - 1: Very light — tank tops, linen, shorts, sandals; for hot weather (above ~80°F / 27°C)
