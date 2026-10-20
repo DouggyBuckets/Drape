@@ -24,6 +24,22 @@ curl localhost:3000/items                                  # list
 Photos must be JPEG, PNG, WebP or GIF (iPhone: set Camera → Formats → Most Compatible).
 They are rotated, resized to 1568px, and stripped of metadata before being sent or stored.
 
+## Building outfits
+
+```bash
+npm run seed                 # optional: load a 33-item fixture wardrobe (removable with -- --reset)
+curl -H 'content-type: application/json' \
+  -d '{"request":"dinner, 45 degrees, smart casual"}' localhost:3000/outfits
+curl -H 'content-type: application/json' \
+  -d '{"request":"job interview tomorrow morning","location":"Chicago"}' localhost:3000/outfits
+```
+
+The agent is a hand-written tool-use loop (capped at 8 model calls) with four tools:
+`search_wardrobe`, `get_weather` (Open-Meteo), `check_outfit_rules`, and `submit_outfit`.
+`submit_outfit` rejects item ids that don't exist and invalid slot combinations, so the agent
+can only return real items; warmth and formality problems come back as warnings. The response
+includes the outfit, token usage, and a trace of every tool call.
+
 ## Evaluation
 
 ### Attribute extraction
