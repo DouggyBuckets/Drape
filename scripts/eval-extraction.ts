@@ -1,10 +1,11 @@
 // Compares model extraction against hand labels and reports accuracy per attribute.
-// Usage: npm run eval:extraction -- [--effort low] [--limit 5] [--concurrency 4]
+// Usage: npm run eval:extraction -- [--labels eval/labels.dev.csv] [--effort low] [--limit 5] [--concurrency 4]
+// eval/labels.csv is the held-out test set (report these); eval/labels.dev.csv is for tuning.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { ExtractionError } from "../src/extraction/errors.js";
-import { type Effort, type ExtractionResult, extractAttributes } from "../src/extraction/extract.js";
+import { type Effort, EXTRACTION_VERSION, type ExtractionResult, extractAttributes } from "../src/extraction/extract.js";
 import { type EvalCase, formatReport, scoreExtraction } from "../src/eval/extraction-metrics.js";
 import { parseLabelsCsv } from "../src/eval/labels.js";
 import { MODEL } from "../src/llm/client.js";
@@ -32,7 +33,7 @@ const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 if (!EFFORTS.includes(args.effort)) fail(`--effort must be one of ${EFFORTS.join(", ")}`);
 const effort = args.effort as Effort;
 
-if (!existsSync(args.labels)) fail(`No labels at ${args.labels}. Copy eval/labels.example.csv and see eval/LABELING.md.`);
+if (!existsSync(args.labels)) fail(`No labels at ${args.labels}. Copy eval/labels.example.csv (header) and see eval/LABELING.md.`);
 let rows: ReturnType<typeof parseLabelsCsv>;
 try {
   rows = parseLabelsCsv(readFileSync(args.labels, "utf8"));
@@ -58,7 +59,8 @@ async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T)
   return results;
 }
 
-console.log(`Extracting ${rows.length} items with ${MODEL} (effort: ${effort})...`);
+const labelSet = path.basename(args.labels, ".csv").replace(/^labels\.?/, "") || "test";
+console.log(`Extracting ${rows.length} items (${labelSet} set) with ${MODEL}, effort ${effort}, prompt ${EXTRACTION_VERSION}...`);
 let done = 0;
 let runs: { row: (typeof rows)[number]; result: ExtractionResult | null; error?: string }[];
 try {
@@ -101,13 +103,16 @@ const cost = (usage.inputTokens * PRICE.input + usage.outputTokens * PRICE.outpu
 console.log(`\nTokens: ${usage.inputTokens} in / ${usage.outputTokens} out   ≈ $${cost.toFixed(3)} at list price`);
 
 mkdirSync(args.out, { recursive: true });
-const outFile = path.join(args.out, `extraction-${new Date().toISOString().replace(/[:.]/g, "-")}-${effort}.json`);
+const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+const outFile = path.join(args.out, `extraction-${labelSet}-${stamp}-${effort}.json`);
 writeFileSync(
   outFile,
   JSON.stringify(
     {
       model: MODEL,
       effort,
+      promptVersion: EXTRACTION_VERSION,
+      labelsFile: args.labels,
       ranAt: new Date().toISOString(),
       usage,
       estimatedCostUsd: cost,

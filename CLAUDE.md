@@ -32,6 +32,7 @@ Use "drape" for the repo, package, and database names.
 - Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
 - Tests never call the real API: inject a fake `Extractor` via `createApp` deps.
 - Evals: only `ExtractionError`s count as model failures; other errors abort the run.
+- Eval labels: `eval/labels.csv` is the held-out test set (report only these); `eval/labels.dev.csv` is for tuning. Never fill labels from model output. Don't tune the rubric against test-set results.
 
 ## Commands
 - `npm run db:up` — start Postgres (host port 5433)

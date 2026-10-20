@@ -1,10 +1,19 @@
+import { createHash } from "node:crypto";
 import Anthropic, { AnthropicError } from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
+import { z } from "zod";
 import { anthropic, MODEL } from "../llm/client.js";
 import { ExtractionError } from "./errors.js";
 import { prepareImage } from "./image.js";
 import { EXTRACTION_SYSTEM_PROMPT } from "./prompt.js";
 import { type ItemAttributes, ItemAttributesSchema } from "./schema.js";
+
+/** Short hash of the prompt + output schema, so eval results can be tied to the exact rubric that produced them. */
+export const EXTRACTION_VERSION = createHash("sha256")
+  .update(EXTRACTION_SYSTEM_PROMPT)
+  .update(JSON.stringify(z.toJSONSchema(ItemAttributesSchema)))
+  .digest("hex")
+  .slice(0, 12);
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 

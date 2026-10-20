@@ -28,8 +28,11 @@ They are rotated, resized to 1568px, and stripped of metadata before being sent 
 
 ### Attribute extraction
 
-`npm run eval:extraction` compares model output to hand labels in `eval/labels.csv`
-(see [eval/LABELING.md](eval/LABELING.md)) and reports accuracy per attribute.
-Options: `--effort low|medium|high`, `--limit N`, `--concurrency N`.
+`npm run eval:extraction` compares model output to hand labels and reports accuracy per
+attribute (see [eval/LABELING.md](eval/LABELING.md)). Labels are split into a held-out
+**test set** (`eval/labels.csv`, the only numbers reported here) and a **dev set**
+(`eval/labels.dev.csv`, used for rubric and prompt changes).
+Options: `--labels FILE`, `--effort low|medium|high`, `--limit N`, `--concurrency N`.
+Each run is saved to `eval/results/` with the model, effort, prompt version hash and labels file.
 
 _Results: pending first labeled run._

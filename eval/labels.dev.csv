@@ -1,0 +1,7 @@
+# Dev set: items whose model output has been seen. Use for tuning the rubric/prompt, not for reported numbers.
+file,category,color,formality,warmth,seasons
+blue-button-down-shirt.jpg,top,blue,4,3,fall;spring;summer
+blue-polo.jpg,top,blue,3,2,spring;summer
+blue-varsity-jacket.jpg,outerwear,blue,2,4,fall;winter
+grey-polo.jpg,top,gray,3,2,spring;summer
+pink-tennis-shoes.jpg,shoes,pink,2,3,spring;summer

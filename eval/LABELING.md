@@ -4,10 +4,18 @@
 Hand labels for `npm run eval:extraction`. The definitions below are the exact rubric
 the model is given, so disagreements measure the model, not differing definitions.
 
+## Dev and test sets
+
+- `eval/labels.csv` — **test set.** Label these before the model ever sees them; only report numbers from this set.
+- `eval/labels.dev.csv` — **dev set.** Items whose model output you've already looked at. Use them to try rubric or
+  prompt changes (`--labels eval/labels.dev.csv`). Once you've seen the model's answers for a test item, it belongs here.
+
+Never copy model answers into a labels file: the eval would then measure the model against itself.
+
 ## How to label
 
 1. Put photos in `images/` (gitignored). One item per photo, plain background if possible.
-2. Add one row per photo to `eval/labels.csv`:
+2. Add one row per photo to the labels file:
 
    ```
    file,category,color,formality,warmth,seasons
