@@ -21,6 +21,7 @@ export function testApp(overrides: Partial<AppDeps> = {}) {
   return createApp({
     db: pool,
     extractor: async () => sampleResult(),
+    secureCookies: false,
     runAgent: async () => {
       throw new Error("runAgent not stubbed for this test");
     },

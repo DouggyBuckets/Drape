@@ -8,6 +8,7 @@ import { openMeteo } from "./weather/weather.js";
 
 const app = createApp({
   db: pool,
+  secureCookies: env.NODE_ENV === "production",
   extractor: (photo) => extractAttributes(photo),
   runAgent: (req) =>
     runOutfitAgent(req, {
