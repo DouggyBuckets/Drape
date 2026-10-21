@@ -53,10 +53,11 @@ describe("gradeRun", () => {
     expect(byCheck(gradeRun(needs, run(["sweater", "chinos", "boots", "bomber"]), lookup)).weather_tool_use).toBe(false);
   });
 
-  it("marks impossible checks n/a but still grades whether the occasion was understood", () => {
-    const gala: OutfitCase = { ...dinner, id: "gala", expect: { temperatureF: [70, 70], formality: [5, 5], needsWeather: false, impossible: ["formality"] } };
-    const r = byCheck(gradeRun(gala, run(["sweater", "chinos", "boots"], { temperatureF: 70, targetFormality: 4 }), lookup));
-    expect(r).toMatchObject({ formality_fits: null, understood_formality: false });
+  it("grades whether the agent understood the occasion's formality", () => {
+    // Items (all formality 3) fit a target of 4 within ±1, but the agent planned for 3.
+    const business: OutfitCase = { ...dinner, id: "business", expect: { temperatureF: [45, 45], formality: [4, 4], needsWeather: false } };
+    const r = byCheck(gradeRun(business, run(["sweater", "chinos", "boots", "bomber"], { targetFormality: 3 }), lookup));
+    expect(r).toMatchObject({ formality_fits: true, understood_formality: false });
   });
 
   it("fails everything but weather use when no outfit was produced", () => {

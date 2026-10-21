@@ -14,8 +14,6 @@ export interface OutfitCase {
     /** Inclusive formality range (1–5) the occasion calls for. */
     formality: [number, number];
     needsWeather: boolean;
-    /** Fit checks the fixture wardrobe can't satisfy; graded n/a instead of failed. */
-    impossible?: ("warmth" | "formality")[];
   };
   tags: string[];
 }
@@ -28,7 +26,7 @@ export type CheckName = (typeof CHECKS)[number];
 
 export interface CheckResult {
   check: CheckName;
-  /** null = not applicable to this case. */
+  /** null = not applicable to this run. */
   passed: boolean | null;
   detail: string;
 }
@@ -37,7 +35,7 @@ const WARMTH_RULES = new Set(["not_too_warm", "warm_enough", "outerwear_when_col
 const inRange = (x: number, [lo, hi]: [number, number]) => x >= lo && x <= hi;
 
 /** Warmth passes if the outfit fits at any whole degree in the expected range. */
-function warmthFits(items: OutfitItem[], [lo, hi]: [number, number]) {
+export function warmthFits(items: OutfitItem[], [lo, hi]: [number, number]) {
   for (let t = lo; t <= hi; t++) {
     const fails = checkFit(items, { temperatureF: t, formality: 3 }).filter((r) => WARMTH_RULES.has(r.rule) && !r.passed);
     if (fails.length === 0) return { passed: true, detail: `fits at ${t}°F` };
@@ -67,21 +65,17 @@ export function gradeRun(c: OutfitCase, r: AgentResult, lookup: Map<string, Outf
   const missing = ids.filter((id) => !lookup.has(id));
   const items = ids.flatMap((id) => lookup.get(id) ?? []);
   const structureFails = checkStructure(items).filter((x) => !x.passed);
-  const impossible = new Set(c.expect.impossible ?? []);
-
-  const warmth = impossible.has("warmth") ? { passed: null, detail: "n/a: wardrobe can't satisfy" } : warmthFits(items, c.expect.temperatureF);
+  const warmth = warmthFits(items, c.expect.temperatureF);
 
   const [fLo, fHi] = c.expect.formality;
   const offFormality = items.filter((i) => i.category !== "accessory" && (i.formality < fLo - 1 || i.formality > fHi + 1));
-  const formality: CheckResult = impossible.has("formality")
-    ? { check: "formality_fits", passed: null, detail: "n/a: wardrobe can't satisfy" }
-    : {
-        check: "formality_fits",
-        passed: offFormality.length === 0,
-        detail: offFormality.length
-          ? `outside ${fLo - 1}–${fHi + 1}: ${offFormality.map((i) => `${i.name}=${i.formality}`).join(", ")}`
-          : "ok",
-      };
+  const formality: CheckResult = {
+    check: "formality_fits",
+    passed: offFormality.length === 0,
+    detail: offFormality.length
+      ? `outside ${fLo - 1}–${fHi + 1}: ${offFormality.map((i) => `${i.name}=${i.formality}`).join(", ")}`
+      : "ok",
+  };
 
   return [
     { check: "completed", passed: true, detail: `${r.iterations} iterations` },
