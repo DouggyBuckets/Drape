@@ -1,10 +1,10 @@
 import pg from "pg";
-import { ensureDatabase } from "../src/db/setup.js";
+import { resetDatabase } from "../src/db/setup.js";
 import { TEST_DATABASE_URL } from "../vitest.config.js";
 
-/** Creates the drape_test database if needed and applies all migrations to it. */
+/** Recreates the drape_test database from scratch and applies all migrations. */
 export async function setup() {
-  await ensureDatabase(TEST_DATABASE_URL);
+  await resetDatabase(TEST_DATABASE_URL);
 
   // Set before importing: the migrate module loads env config at import time.
   process.env.DATABASE_URL = TEST_DATABASE_URL;

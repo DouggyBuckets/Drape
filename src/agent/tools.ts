@@ -56,6 +56,11 @@ export interface ToolOutcome {
 export interface ToolDeps {
   db: Queryable;
   weather: WeatherProvider;
+  /**
+   * Whose wardrobe the tools can see. Comes from the authenticated session, never from
+   * model input: no tool schema has a user field, so the model can't ask for another user.
+   */
+  userId: string;
 }
 
 const summarize = (i: WardrobeItem) => ({
@@ -68,8 +73,8 @@ const toOutfitItem = (i: WardrobeItem): OutfitItem => ({
 });
 
 /** Resolves ids against the database and runs every rule. */
-async function evaluate(db: Queryable, input: z.infer<typeof OutfitInput>) {
-  const found = await getItemsByIds(db, input.item_ids);
+async function evaluate(db: Queryable, userId: string, input: z.infer<typeof OutfitInput>) {
+  const found = await getItemsByIds(db, userId, input.item_ids);
   const byId = new Map(found.map((i) => [i.id, i]));
   const unknownIds = [...new Set(input.item_ids.filter((id) => !byId.has(id)))];
   const items = input.item_ids.flatMap((id) => byId.get(id) ?? []);
@@ -97,8 +102,8 @@ export const TOOLS = {
       "each with its id. Only ids returned by this tool exist. Run several narrow searches (e.g. one per category) " +
       "rather than one broad one.",
     input: SearchInput,
-    async run(i, { db }) {
-      const items = await searchItems(db, {
+    async run(i, { db, userId }) {
+      const items = await searchItems(db, userId, {
         category: i.category, colors: i.colors,
         formalityMin: i.formality_min, formalityMax: i.formality_max,
         warmthMin: i.warmth_min, warmthMax: i.warmth_max,
@@ -123,8 +128,8 @@ export const TOOLS = {
       "Check a candidate outfit before submitting. Reports unknown ids, structure problems (slots), and fit " +
       "problems (warmth for the temperature, formality for the occasion).",
     input: OutfitInput,
-    async run(i, { db }) {
-      const r = await evaluate(db, i);
+    async run(i, { db, userId }) {
+      const r = await evaluate(db, userId, i);
       return {
         content: {
           unknown_ids: r.unknownIds,
@@ -142,8 +147,8 @@ export const TOOLS = {
       "Submit the final outfit. Rejected if any id is unknown or the slots are invalid; fix and resubmit. " +
       "Warmth/formality problems are accepted as warnings, so mention any compromise in the explanation.",
     input: SubmitInput,
-    async run(i, { db }) {
-      const r = await evaluate(db, i);
+    async run(i, { db, userId }) {
+      const r = await evaluate(db, userId, i);
       if (r.unknownIds.length || !r.structureOk) {
         return {
           content: {

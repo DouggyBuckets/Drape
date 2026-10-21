@@ -18,6 +18,22 @@ export async function ensureDatabase(url: string): Promise<void> {
   }
 }
 
+/** Drops and recreates the database so every test/eval run starts from an identical, empty state. */
+export async function resetDatabase(url: string): Promise<void> {
+  const name = decodeURIComponent(new URL(url).pathname.slice(1));
+  if (!/^drape_(test|eval)$/.test(name)) throw new Error(`Refusing to reset non-test database: ${name}`);
+  const admin = new URL(url);
+  admin.pathname = "/postgres";
+  const client = new pg.Client({ connectionString: admin.href });
+  await client.connect();
+  try {
+    await client.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
+    await client.query(`CREATE DATABASE ${name}`);
+  } finally {
+    await client.end();
+  }
+}
+
 /** Points DATABASE_URL at a sibling database on the same server (e.g. drape → drape_eval). */
 export function siblingDatabaseUrl(url: string, name: string): string {
   const u = new URL(url);

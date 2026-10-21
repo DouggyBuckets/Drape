@@ -39,7 +39,8 @@ export async function runMigrations(db: pg.Pool = pool): Promise<string[]> {
         await client.query("COMMIT");
       } catch (err) {
         await client.query("ROLLBACK");
-        throw new Error(`Migration ${file} failed: ${(err as Error).message}`, { cause: err });
+        const hint = (err as { hint?: string }).hint;
+        throw new Error(`Migration ${file} failed: ${(err as Error).message}${hint ? `\n  ${hint}` : ""}`, { cause: err });
       }
       applied.push(file);
     }

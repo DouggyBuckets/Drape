@@ -1,3 +1,5 @@
+// Every function takes a required userId and filters on it: there is deliberately no
+// way to query items across users. Another user's item looks exactly like a missing one.
 import type { Queryable } from "../db/pool.js";
 import type { ItemAttributes } from "../extraction/schema.js";
 
@@ -23,6 +25,8 @@ interface Row {
 // Never selects the image bytes themselves; those are served by getItemImage.
 const COLUMNS = "id, name, category, color, formality, warmth, seasons, image IS NOT NULL AS has_image, created_at";
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function toItem(r: Row): WardrobeItem {
   return {
     id: r.id,
@@ -39,6 +43,7 @@ function toItem(r: Row): WardrobeItem {
 
 export async function insertItem(
   db: Queryable,
+  userId: string,
   input: {
     id: string;
     attributes: ItemAttributes;
@@ -50,17 +55,20 @@ export async function insertItem(
   const a = input.attributes;
   const { rows } = await db.query<Row>(
     `INSERT INTO wardrobe_items
-       (id, name, category, color, formality, warmth, seasons, image, extraction_model, extraction)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       (id, user_id, name, category, color, formality, warmth, seasons, image, extraction_model, extraction)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING ${COLUMNS}`,
-    [input.id, a.name, a.category, a.color, a.formality, a.warmth, a.seasons,
+    [input.id, userId, a.name, a.category, a.color, a.formality, a.warmth, a.seasons,
      input.image, input.model, JSON.stringify(input.extraction)],
   );
   return toItem(rows[0]!);
 }
 
-export async function listItems(db: Queryable): Promise<WardrobeItem[]> {
-  const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items ORDER BY created_at DESC`);
+export async function listItems(db: Queryable, userId: string): Promise<WardrobeItem[]> {
+  const { rows } = await db.query<Row>(
+    `SELECT ${COLUMNS} FROM wardrobe_items WHERE user_id = $1 ORDER BY created_at DESC`,
+    [userId],
+  );
   return rows.map(toItem);
 }
 
@@ -77,10 +85,10 @@ export interface ItemFilters {
 }
 
 /** Filtered wardrobe search. Values are always bound parameters, never interpolated. */
-export async function searchItems(db: Queryable, f: ItemFilters): Promise<WardrobeItem[]> {
-  const where: string[] = [];
+export async function searchItems(db: Queryable, userId: string, f: ItemFilters): Promise<WardrobeItem[]> {
   const params: unknown[] = [];
   const bind = (v: unknown) => `$${params.push(v)}`;
+  const where = [`user_id = ${bind(userId)}`];
 
   if (f.category) where.push(`category = ${bind(f.category)}`);
   if (f.colors?.length) where.push(`color = ANY(${bind(f.colors)})`);
@@ -92,30 +100,35 @@ export async function searchItems(db: Queryable, f: ItemFilters): Promise<Wardro
   if (f.nameContains) where.push(`name ILIKE ${bind(`%${f.nameContains.replace(/[\\%_]/g, "\\$&")}%`)}`);
 
   const sql = `SELECT ${COLUMNS} FROM wardrobe_items
-    ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+    WHERE ${where.join(" AND ")}
     ORDER BY category, formality, name
     LIMIT ${bind(Math.min(f.limit ?? 25, 50))}`;
   const { rows } = await db.query<Row>(sql, params);
   return rows.map(toItem);
 }
 
-/** Looks up several items at once; missing ids are simply absent from the result. */
-export async function getItemsByIds(db: Queryable, ids: string[]): Promise<WardrobeItem[]> {
+/** Looks up several of the user's items; missing or other users' ids are simply absent. */
+export async function getItemsByIds(db: Queryable, userId: string, ids: string[]): Promise<WardrobeItem[]> {
   const valid = ids.filter((id) => UUID.test(id));
   if (!valid.length) return [];
-  const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE id = ANY($1::uuid[])`, [valid]);
+  const { rows } = await db.query<Row>(
+    `SELECT ${COLUMNS} FROM wardrobe_items WHERE user_id = $1 AND id = ANY($2::uuid[])`,
+    [userId, valid],
+  );
   return rows.map(toItem);
 }
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-export async function getItemImage(db: Queryable, id: string): Promise<Buffer | null> {
+export async function getItemImage(db: Queryable, userId: string, id: string): Promise<Buffer | null> {
   if (!UUID.test(id)) return null;
-  const { rows } = await db.query<{ image: Buffer | null }>("SELECT image FROM wardrobe_items WHERE id = $1", [id]);
+  const { rows } = await db.query<{ image: Buffer | null }>(
+    "SELECT image FROM wardrobe_items WHERE user_id = $1 AND id = $2",
+    [userId, id],
+  );
   return rows[0]?.image ?? null;
 }
 
-export async function getItem(db: Queryable, id: string): Promise<WardrobeItem | null> {
-  const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE id = $1`, [id]);
+export async function getItem(db: Queryable, userId: string, id: string): Promise<WardrobeItem | null> {
+  if (!UUID.test(id)) return null;
+  const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE user_id = $1 AND id = $2`, [userId, id]);
   return rows[0] ? toItem(rows[0]) : null;
 }

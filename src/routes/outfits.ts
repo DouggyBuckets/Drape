@@ -1,8 +1,9 @@
 import { Router } from "express";
+import { requireUser } from "../auth/middleware.js";
 import { z } from "zod";
 import type { AgentRequest, AgentResult } from "../agent/loop.js";
 
-export type RunAgent = (req: AgentRequest) => Promise<AgentResult>;
+export type RunAgent = (req: AgentRequest, userId: string) => Promise<AgentResult>;
 
 const Body = z.object({
   request: z.string().trim().min(1).max(500),
@@ -12,14 +13,14 @@ const Body = z.object({
 export function outfitsRouter(deps: { runAgent: RunAgent }): Router {
   const router = Router();
 
-  router.post("/outfits", async (req, res) => {
+  router.post("/outfits", requireUser, async (req, res) => {
     const body = Body.safeParse(req.body);
     if (!body.success) {
       res.status(400).json({ error: "invalid_request", issues: body.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) });
       return;
     }
 
-    const result = await deps.runAgent(body.data);
+    const result = await deps.runAgent(body.data, req.user!.id);
     // 422: the request was fine, but the agent couldn't produce an outfit (cap hit, refusal, truncation).
     res.status(result.status === "ok" ? 200 : 422).json(result);
   });

@@ -27,7 +27,8 @@ They are rotated, resized to 1568px, and stripped of metadata before being sent 
 ## Building outfits
 
 ```bash
-npm run seed                 # optional: load a 33-item fixture wardrobe (removable with -- --reset)
+npm run create-user -- --email you@example.com      # create an account (or POST /auth/signup)
+npm run seed -- --email you@example.com             # optional: 33-item fixture wardrobe (-- --reset removes it)
 curl -H 'content-type: application/json' \
   -d '{"request":"dinner, 45 degrees, smart casual"}' localhost:3000/outfits
 curl -H 'content-type: application/json' \

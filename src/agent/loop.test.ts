@@ -1,7 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { pool } from "../db/pool.js";
-import { seedFixtures } from "../items/fixtures.js";
+import { ensureUser, seedFixtures } from "../items/fixtures.js";
 import { searchItems } from "../items/repository.js";
 import { fixedWeather } from "../weather/weather.js";
 import { type CreateMessage, runOutfitAgent } from "./loop.js";
@@ -31,16 +31,20 @@ function scripted(turns: (Anthropic.Beta.BetaMessage | (() => Anthropic.Beta.Bet
 }
 
 let ids: { top: string; bottom: string; shoes: string; jacket: string };
+let userId: string;
+let otherUserId: string;
 const weather = fixedWeather({ chicago: { highF: 48, lowF: 40, precipitationChancePct: 10 } });
 const deps = (createMessage: CreateMessage, maxIterations?: number) =>
-  ({ db: pool, weather, createMessage, maxIterations, now: () => new Date("2026-10-20T12:00:00Z") });
+  ({ db: pool, userId, weather, createMessage, maxIterations, now: () => new Date("2026-10-20T12:00:00Z") });
 const submit = (item_ids: string[]) =>
   toolUse("submit_outfit", { item_ids, temperature_f: 45, target_formality: 3, explanation: "Smart casual with a jacket." });
 
 beforeAll(async () => {
-  await pool.query("TRUNCATE wardrobe_items");
-  await seedFixtures(pool);
-  const one = async (nameContains: string) => (await searchItems(pool, { nameContains }))[0]!.id;
+  await pool.query("TRUNCATE users, wardrobe_items CASCADE");
+  userId = await ensureUser(pool, "owner@example.com");
+  otherUserId = await ensureUser(pool, "other@example.com");
+  await seedFixtures(pool, userId);
+  const one = async (nameContains: string) => (await searchItems(pool, userId, { nameContains }))[0]!.id;
   ids = {
     top: await one("merino"), bottom: await one("khaki chinos"),
     shoes: await one("leather lace-up boots"), jacket: await one("suede bomber"),
@@ -125,6 +129,23 @@ describe("runOutfitAgent", () => {
   it("returns refused without running tools", async () => {
     const { createMessage } = scripted([message([], "refusal")]);
     expect((await runOutfitAgent({ request: "x" }, deps(createMessage))).status).toBe("refused");
+  });
+
+  it("only lets the agent see and submit the session user's items", async () => {
+    // Another user's agent searches, then tries to submit this user's (real) item ids.
+    const { createMessage, calls } = scripted([
+      message([toolUse("search_wardrobe", {})]),
+      message([submit([ids.top, ids.bottom, ids.shoes, ids.jacket])]),
+      message([text("I can't find any items.")], "end_turn"),
+    ]);
+    const r = await runOutfitAgent({ request: "x" }, { ...deps(createMessage, 3), userId: otherUserId });
+
+    const search = JSON.parse((calls[1]!.messages[2]!.content as Anthropic.Beta.BetaToolResultBlockParam[])[0]!.content as string);
+    expect(search).toEqual({ count: 0, items: [] });
+    const submitResult = (calls[2]!.messages[4]!.content as Anthropic.Beta.BetaToolResultBlockParam[])[0]!;
+    expect(submitResult.is_error).toBe(true);
+    expect(JSON.parse(submitResult.content as string).unknown_ids).toHaveLength(4);
+    expect(r.outfit).toBeNull();
   });
 
   it("sends history back unchanged, including thinking blocks", async () => {

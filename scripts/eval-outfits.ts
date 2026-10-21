@@ -4,7 +4,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { ensureDatabase, siblingDatabaseUrl } from "../src/db/setup.js";
+import { resetDatabase, siblingDatabaseUrl } from "../src/db/setup.js";
 
 const { values: args } = parseArgs({
   options: {
@@ -28,12 +28,12 @@ try {
 } catch {}
 if (!process.env.DATABASE_URL) fail("DATABASE_URL is not set (see .env.example).");
 const evalUrl = siblingDatabaseUrl(process.env.DATABASE_URL, "drape_eval");
-await ensureDatabase(evalUrl);
+await resetDatabase(evalUrl); // identical empty state every run
 process.env.DATABASE_URL = evalUrl;
 
 const { runMigrations } = await import("../src/db/migrate.js");
 const { pool } = await import("../src/db/pool.js");
-const { seedFixtures } = await import("../src/items/fixtures.js");
+const { ensureUser, seedFixtures } = await import("../src/items/fixtures.js");
 const { listItems } = await import("../src/items/repository.js");
 const { AGENT_VERSION, runOutfitAgent } = await import("../src/agent/loop.js");
 const { anthropic, MODEL } = await import("../src/llm/client.js");
@@ -55,11 +55,11 @@ if (args.case) cases = cases.filter((c) => c.id === args.case);
 if (!cases.length) fail("No cases match the filters.");
 
 try {
-  // Fresh, fixture-only wardrobe every run.
+  // Fresh database, fixture-only wardrobe.
   await runMigrations(pool);
-  await pool.query("TRUNCATE wardrobe_items");
-  await seedFixtures(pool);
-  const lookup = new Map((await listItems(pool)).map((i) => [i.id, i]));
+  const userId = await ensureUser(pool);
+  await seedFixtures(pool, userId);
+  const lookup = new Map((await listItems(pool, userId)).map((i) => [i.id, i]));
 
   const tasks = cases.flatMap((c) => Array.from({ length: repeats }, (_, repeat) => ({ c, repeat })));
   console.log(`Running ${cases.length} cases × ${repeats} = ${tasks.length} runs with ${MODEL}, effort ${effort}, agent ${AGENT_VERSION}...`);
@@ -75,7 +75,7 @@ try {
       // API/infra errors propagate and abort the whole run: they are not agent failures.
       const r = await runOutfitAgent(
         { request: c.request, ...(c.location ? { location: c.location } : {}) },
-        { db: pool, weather: EVAL_WEATHER, now: () => EVAL_NOW, effort, createMessage: (p) => anthropic.beta.messages.create(p) },
+        { db: pool, userId, weather: EVAL_WEATHER, now: () => EVAL_NOW, effort, createMessage: (p) => anthropic.beta.messages.create(p) },
       );
       const latencyMs = performance.now() - t0;
       const checks = gradeRun(c, r, lookup);

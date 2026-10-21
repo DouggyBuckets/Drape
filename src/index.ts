@@ -10,9 +10,10 @@ const app = createApp({
   db: pool,
   secureCookies: env.NODE_ENV === "production",
   extractor: (photo) => extractAttributes(photo),
-  runAgent: (req) =>
+  runAgent: (req, userId) =>
     runOutfitAgent(req, {
       db: pool,
+      userId,
       weather: openMeteo,
       createMessage: (params) => anthropic.beta.messages.create(params),
     }),

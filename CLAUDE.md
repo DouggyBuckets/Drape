@@ -32,6 +32,8 @@ Use "drape" for the repo, package, and database names.
 - Schema changes are new numbered files in `migrations/` (`NNN_description.sql`); never edit an applied migration.
 - Check current Anthropic docs for API shapes rather than relying on memory.
 - Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
+- Every repository function takes a required `userId`; never add an unscoped item query. Agent tools get `userId` from `ToolDeps` (the session), never from tool input. Other users' items return 404, not 403.
+- Test and eval databases (`drape_test`, `drape_eval`) are dropped and recreated each run.
 - Tests never call the real API: inject a fake `Extractor`/`runAgent` via `createApp` deps, or a scripted `createMessage` into the agent loop.
 - Agent loop history is append-only: push `response.content` back unchanged (thinking blocks included); all tool results for one turn go in a single user message.
 - Outfit eval grades against each case's EXPECTED temperature/formality, never the agent's own claims. After any prompt/tool change, re-run the full set (not just the case you fixed) to catch regressions.
@@ -44,7 +46,8 @@ Use "drape" for the repo, package, and database names.
 - `npm run migrate` — apply pending migrations
 - `npm run dev` — run the server with reload
 - `npm test` — run tests (uses a separate `drape_test` database, created automatically)
-- `npm run seed` — load the fixture wardrobe into the dev DB (`-- --reset` removes it; real items untouched)
+- `npm run create-user -- --email you@x.com [--demo] [--claim-unowned]` — create an account from the CLI (password prompted)
+- `npm run seed -- [--email you@x.com]` — load the fixture wardrobe into a user's wardrobe (default `fixtures@drape.local`; `--reset` removes it; real items untouched)
 - `npm run eval:extraction` — extraction accuracy vs `eval/labels.csv` (calls the API; costs money)
 - `npm run eval:outfits -- --repeats 3` — outfit agent eval in a separate `drape_eval` DB (≈$2.50 for 3 repeats; use 1 while iterating, 3 for reported numbers)
 - `npm run labeling-guide` — regenerate `eval/LABELING.md` after editing `src/extraction/rubric.ts`
