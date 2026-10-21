@@ -3,7 +3,8 @@ import type { ItemAttributes } from "../extraction/schema.js";
 
 export interface WardrobeItem extends ItemAttributes {
   id: string;
-  imagePath: string;
+  /** Relative URL of the item photo, or null for items without one (e.g. fixtures). */
+  imageUrl: string | null;
   createdAt: Date;
 }
 
@@ -15,11 +16,12 @@ interface Row {
   formality: number;
   warmth: number;
   seasons: ItemAttributes["seasons"];
-  image_path: string;
+  has_image: boolean;
   created_at: Date;
 }
 
-const COLUMNS = "id, name, category, color, formality, warmth, seasons, image_path, created_at";
+// Never selects the image bytes themselves; those are served by getItemImage.
+const COLUMNS = "id, name, category, color, formality, warmth, seasons, image IS NOT NULL AS has_image, created_at";
 
 function toItem(r: Row): WardrobeItem {
   return {
@@ -30,7 +32,7 @@ function toItem(r: Row): WardrobeItem {
     formality: r.formality,
     warmth: r.warmth,
     seasons: r.seasons,
-    imagePath: r.image_path,
+    imageUrl: r.has_image ? `/items/${r.id}/image` : null,
     createdAt: r.created_at,
   };
 }
@@ -40,7 +42,7 @@ export async function insertItem(
   input: {
     id: string;
     attributes: ItemAttributes;
-    imagePath: string;
+    image: Buffer | null;
     model: string;
     extraction: unknown;
   },
@@ -48,11 +50,11 @@ export async function insertItem(
   const a = input.attributes;
   const { rows } = await db.query<Row>(
     `INSERT INTO wardrobe_items
-       (id, name, category, color, formality, warmth, seasons, image_path, extraction_model, extraction)
+       (id, name, category, color, formality, warmth, seasons, image, extraction_model, extraction)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING ${COLUMNS}`,
     [input.id, a.name, a.category, a.color, a.formality, a.warmth, a.seasons,
-     input.imagePath, input.model, JSON.stringify(input.extraction)],
+     input.image, input.model, JSON.stringify(input.extraction)],
   );
   return toItem(rows[0]!);
 }
@@ -106,6 +108,12 @@ export async function getItemsByIds(db: Queryable, ids: string[]): Promise<Wardr
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function getItemImage(db: Queryable, id: string): Promise<Buffer | null> {
+  if (!UUID.test(id)) return null;
+  const { rows } = await db.query<{ image: Buffer | null }>("SELECT image FROM wardrobe_items WHERE id = $1", [id]);
+  return rows[0]?.image ?? null;
+}
 
 export async function getItem(db: Queryable, id: string): Promise<WardrobeItem | null> {
   const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE id = $1`, [id]);

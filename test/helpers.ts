@@ -1,6 +1,3 @@
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import path from "node:path";
 import sharp from "sharp";
 import { type AppDeps, createApp } from "../src/app.js";
 import { pool } from "../src/db/pool.js";
@@ -24,7 +21,6 @@ export function testApp(overrides: Partial<AppDeps> = {}) {
   return createApp({
     db: pool,
     extractor: async () => sampleResult(),
-    uploadDir: mkdtempSync(path.join(tmpdir(), "drape-test-")),
     runAgent: async () => {
       throw new Error("runAgent not stubbed for this test");
     },

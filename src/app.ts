@@ -9,7 +9,6 @@ import { outfitsRouter, type RunAgent } from "./routes/outfits.js";
 export interface AppDeps {
   db: Queryable;
   extractor: Extractor;
-  uploadDir: string;
   runAgent: RunAgent;
 }
 

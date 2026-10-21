@@ -9,7 +9,6 @@ import { openMeteo } from "./weather/weather.js";
 const app = createApp({
   db: pool,
   extractor: (photo) => extractAttributes(photo),
-  uploadDir: env.UPLOAD_DIR,
   runAgent: (req) =>
     runOutfitAgent(req, {
       db: pool,

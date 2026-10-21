@@ -27,7 +27,7 @@ export async function seedFixtures(db: Queryable): Promise<number> {
     await insertItem(db, {
       id: randomUUID(),
       attributes,
-      imagePath: "fixture:no-image",
+      image: null,
       model: FIXTURE_MODEL,
       extraction: { fixture: true },
     });

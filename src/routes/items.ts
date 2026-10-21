@@ -1,16 +1,14 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, rm, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { z } from "zod";
 import type { Queryable } from "../db/pool.js";
 import type { Extractor } from "../extraction/extract.js";
-import { getItem, insertItem, listItems } from "../items/repository.js";
+import { getItem, getItemImage, insertItem, listItems } from "../items/repository.js";
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 
-export function itemsRouter(deps: { db: Queryable; extractor: Extractor; uploadDir: string }): Router {
+export function itemsRouter(deps: { db: Queryable; extractor: Extractor }): Router {
   const router = Router();
 
   router.post("/items", upload.single("image"), async (req, res) => {
@@ -20,26 +18,16 @@ export function itemsRouter(deps: { db: Queryable; extractor: Extractor; uploadD
     }
 
     const result = await deps.extractor(req.file.buffer);
-
-    // Store the normalized JPEG (metadata already stripped), not the original upload.
-    const id = randomUUID();
-    await mkdir(deps.uploadDir, { recursive: true });
-    const imagePath = path.join(deps.uploadDir, `${id}.jpg`);
-    await writeFile(imagePath, result.image);
-
-    try {
-      const item = await insertItem(deps.db, {
-        id,
-        attributes: result.attributes,
-        imagePath,
-        model: result.model,
-        extraction: { attributes: result.attributes, usage: result.usage },
-      });
-      res.status(201).json(item);
-    } catch (err) {
-      await rm(imagePath, { force: true }); // don't leave orphaned files
-      throw err;
-    }
+    // Stores the normalized JPEG (metadata already stripped), not the original upload,
+    // in the same row as its attributes, so there's no file to orphan if the insert fails.
+    const item = await insertItem(deps.db, {
+      id: randomUUID(),
+      attributes: result.attributes,
+      image: result.image,
+      model: result.model,
+      extraction: { attributes: result.attributes, usage: result.usage },
+    });
+    res.status(201).json(item);
   });
 
   router.get("/items", async (_req, res) => {
@@ -54,6 +42,16 @@ export function itemsRouter(deps: { db: Queryable; extractor: Extractor; uploadD
       return;
     }
     res.json(item);
+  });
+
+  router.get("/items/:id/image", async (req, res) => {
+    const image = await getItemImage(deps.db, req.params.id);
+    if (!image) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+    // An item's image never changes, so browsers and CDNs may cache it indefinitely.
+    res.set("Cache-Control", "public, max-age=31536000, immutable").type("image/jpeg").send(image);
   });
 
   return router;
