@@ -14,7 +14,9 @@ structured attributes, and an agent builds outfits using only items in that ward
 2. Item extraction — photo → validated JSON (type, color, formality, warmth, season) → `wardrobe_items`; accuracy script vs hand-labeled CSV.
 3. Outfit agent — tools `search_wardrobe`, `get_weather`, `check_outfit_rules`; hand-written loop with an iteration cap; returned item IDs must exist (enforced in code).
 4. Evaluation — every item exists, one item per slot, warmth fits weather, formality fits occasion; pass rates over test requests.
-5. Frontend (later).
+5. Accounts — email/password auth, per-user wardrobes (agent tools scoped by the session's user id), quotas, read-only demo account.
+6. Frontend — React + Vite, outfit view with item photos, live agent progress.
+7. Deploy — public demo with rate limits and spend caps.
 
 ## Stack
 TypeScript, Node.js, Express, PostgreSQL (Docker Compose), Zod, numbered SQL migrations,
