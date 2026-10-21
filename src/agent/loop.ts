@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { Effort } from "../extraction/extract.js";
 import { MODEL } from "../llm/client.js";
@@ -38,6 +39,14 @@ export interface AgentResult {
 }
 
 export const DEFAULT_MAX_ITERATIONS = 8;
+
+/** Short hash of the prompt, tool definitions and cap, so eval results map to an exact agent version. */
+export const AGENT_VERSION = createHash("sha256")
+  .update(AGENT_SYSTEM_PROMPT)
+  .update(JSON.stringify(TOOL_DEFINITIONS))
+  .update(String(DEFAULT_MAX_ITERATIONS))
+  .digest("hex")
+  .slice(0, 12);
 
 const NUDGE = "Please finish by calling submit_outfit with your chosen item ids.";
 
