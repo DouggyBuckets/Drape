@@ -32,6 +32,7 @@ Use "drape" for the repo, package, and database names.
 - Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
 - Tests never call the real API: inject a fake `Extractor`/`runAgent` via `createApp` deps, or a scripted `createMessage` into the agent loop.
 - Agent loop history is append-only: push `response.content` back unchanged (thinking blocks included); all tool results for one turn go in a single user message.
+- Outfit eval grades against each case's EXPECTED temperature/formality, never the agent's own claims. After any prompt/tool change, re-run the full set (not just the case you fixed) to catch regressions.
 - Outfit rules live in `src/outfit/rules.ts` and are shared by the agent tools and evals. Structure rules are hard (submit rejects); fit rules are warnings.
 - Evals: only `ExtractionError`s count as model failures; other errors abort the run.
 - Eval labels: `eval/labels.csv` is the held-out test set (report only these); `eval/labels.dev.csv` is for tuning. Never fill labels from model output. Don't tune the rubric against test-set results.
@@ -43,4 +44,5 @@ Use "drape" for the repo, package, and database names.
 - `npm test` — run tests (uses a separate `drape_test` database, created automatically)
 - `npm run seed` — load the fixture wardrobe into the dev DB (`-- --reset` removes it; real items untouched)
 - `npm run eval:extraction` — extraction accuracy vs `eval/labels.csv` (calls the API; costs money)
+- `npm run eval:outfits -- --repeats 3` — outfit agent eval in a separate `drape_eval` DB (≈$2.50 for 3 repeats; use 1 while iterating, 3 for reported numbers)
 - `npm run labeling-guide` — regenerate `eval/LABELING.md` after editing `src/extraction/rubric.ts`

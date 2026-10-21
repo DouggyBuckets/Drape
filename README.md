@@ -42,6 +42,46 @@ includes the outfit, token usage, and a trace of every tool call.
 
 ## Evaluation
 
+### Outfit agent
+
+`npm run eval:outfits -- --repeats 3` runs 18 test requests ([eval/outfit-cases.json](eval/outfit-cases.json))
+against a fixed 33-item fixture wardrobe, fixed weather and a fixed date, three times each.
+Every run is graded by deterministic checks:
+
+| Check | What it verifies |
+|---|---|
+| `completed` | The agent submitted an outfit within the 8-call cap |
+| `items_exist` | Every item id exists (independent database lookup, not the agent's own output) |
+| `one_per_slot` | Top + bottom or a dress, one pair of shoes, ≤1 outerwear, ≤3 accessories, no duplicates |
+| `warmth_fits` | Warmth fits the case's **expected** temperature, not the temperature the agent claims |
+| `formality_fits` | Every clothing item is within ±1 of the case's **expected** formality range |
+| `understood_temperature` | The temperature the agent planned for is in the expected range |
+| `understood_formality` | The formality the agent planned for is in the expected range |
+| `weather_tool_use` | `get_weather` is called if and only if the request doesn't state a temperature |
+
+A unit test brute-forces the fixture wardrobe to confirm every case is satisfiable.
+
+**Results** (`claude-opus-5-5`, effort `medium`, 54 runs per row):
+
+| Agent version | All checks pass | Your four core checks | Failures | Mean calls | Mean latency | Cost |
+|---|---|---|---|---|---|---|
+| Baseline | 94% (51/54) | 100% | morning case: used the daily high (30°F) instead of the morning low, 3/3 runs | 3.4 | 15.5s | $2.45 |
+| Time-of-day prompt fix | **100% (54/54)** | 100% | none | 3.3 | 14.8s | $2.42 |
+
+**What changed:** the prompt said "use the high for daytime plans, the low for evening plans",
+which left mornings ambiguous. The agent consistently read "interview tomorrow morning" as daytime.
+The fix maps early morning, evening and night to the daily low. The whole suite was re-run to
+check that nothing else got worse.
+
+**Limitations:**
+- **Near ceiling.** The ±1 tolerance and a flexible fixture wardrobe make these cases easy to
+  pass. This set catches regressions but can't separate a good agent from a great one. Harder
+  cases (tighter wardrobes, conflicting constraints) are future work.
+- **The checks don't measure style.** Color harmony and whether items look good together aren't
+  graded; that would need an LLM-as-judge checked against human ratings.
+- **The baseline's misreading didn't change the outfit:** 15°F and 30°F map to the same warmth
+  level, so `warmth_fits` passed either way.
+
 ### Attribute extraction
 
 `npm run eval:extraction` compares model output to hand labels and reports accuracy per
@@ -51,4 +91,6 @@ attribute (see [eval/LABELING.md](eval/LABELING.md)). Labels are split into a he
 Options: `--labels FILE`, `--effort low|medium|high`, `--limit N`, `--concurrency N`.
 Each run is saved to `eval/results/` with the model, effort, prompt version hash and labels file.
 
-_Results: pending first labeled run._
+_Results: pending a labeled test set. On the 5-item dev set, category, color and formality are
+100% after fixing the rubric; warmth is 40% exact (100% within ±1), with the labeler consistently
+rating one level warmer than the model._
