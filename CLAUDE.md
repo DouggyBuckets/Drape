@@ -25,7 +25,7 @@ Use "drape" for the repo, package, and database names.
 - One stage at a time; don't start the next until the current one works end to end.
 - Explain design decisions and tradeoffs before implementing; call out interview-worthy concepts.
 - Small commits with clear conventional messages (`feat:`, `chore:`, `fix:`, `test:`, `docs:`).
-- Never commit API keys or personal photos. `.env`, `images/`, `uploads/` are gitignored.
+- Never commit API keys or personal photos. `.env`, `images/`, `uploads/` are gitignored. Item photos are stored in Postgres (`wardrobe_items.image`), so never commit database dumps either.
 - All env config goes through `src/config/env.ts` (Zod, fails fast). Don't read `process.env` elsewhere.
 - Schema changes are new numbered files in `migrations/` (`NNN_description.sql`); never edit an applied migration.
 - Check current Anthropic docs for API shapes rather than relying on memory.
