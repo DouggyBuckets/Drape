@@ -9,9 +9,8 @@ import { type Effort, EXTRACTION_VERSION, type ExtractionResult, extractAttribut
 import { type EvalCase, formatReport, scoreExtraction } from "../src/eval/extraction-metrics.js";
 import { parseLabelsCsv } from "../src/eval/labels.js";
 import { MODEL } from "../src/llm/client.js";
+import { estimateCostUsd } from "../src/llm/pricing.js";
 
-// List price for claude-opus-5-5, USD per million tokens. Estimate only; check current pricing.
-const PRICE = { input: 4, output: 20 };
 
 const { values: args } = parseArgs({
   options: {
@@ -99,7 +98,7 @@ const usage = runs.reduce(
   }),
   { inputTokens: 0, outputTokens: 0 },
 );
-const cost = (usage.inputTokens * PRICE.input + usage.outputTokens * PRICE.output) / 1e6;
+const cost = estimateCostUsd(usage);
 console.log(`\nTokens: ${usage.inputTokens} in / ${usage.outputTokens} out   ≈ $${cost.toFixed(3)} at list price`);
 
 mkdirSync(args.out, { recursive: true });
