@@ -3,6 +3,7 @@ import request from "supertest";
 import { type AppDeps, createApp } from "../src/app.js";
 import { pool } from "../src/db/pool.js";
 import type { ExtractionResult } from "../src/extraction/extract.js";
+import { DEFAULT_LIMITS } from "../src/limits/limits.js";
 
 export const sampleResult = (): ExtractionResult => ({
   attributes: {
@@ -23,6 +24,8 @@ export function testApp(overrides: Partial<AppDeps> = {}) {
     db: pool,
     extractor: async () => sampleResult(),
     secureCookies: false,
+    // Generous so unrelated tests never hit a limit; limit tests override these.
+    limits: { ...DEFAULT_LIMITS, signupsPerIpPerDay: 1000, uploadsPerUserPerDay: 1000, outfitsPerUserPerDay: 1000 },
     runAgent: async () => {
       throw new Error("runAgent not stubbed for this test");
     },

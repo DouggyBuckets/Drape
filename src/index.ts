@@ -9,6 +9,15 @@ import { openMeteo } from "./weather/weather.js";
 const app = createApp({
   db: pool,
   secureCookies: env.NODE_ENV === "production",
+  trustProxy: env.TRUST_PROXY,
+  limits: {
+    uploadsPerUserPerDay: env.LIMIT_UPLOADS_PER_USER,
+    outfitsPerUserPerDay: env.LIMIT_OUTFITS_PER_USER,
+    demoOutfitsPerIpPerDay: env.LIMIT_DEMO_OUTFITS_PER_IP,
+    demoOutfitsPerDay: env.LIMIT_DEMO_OUTFITS_TOTAL,
+    signupsPerIpPerDay: env.LIMIT_SIGNUPS_PER_IP,
+    dailySpendCapUsd: env.DAILY_SPEND_CAP_USD,
+  },
   extractor: (photo) => extractAttributes(photo),
   runAgent: (req, userId) =>
     runOutfitAgent(req, {

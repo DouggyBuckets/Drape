@@ -1,6 +1,6 @@
 import type { CookieOptions, NextFunction, Request, RequestHandler, Response } from "express";
 import type { Queryable } from "../db/pool.js";
-import { getSessionUser, SESSION_TTL_MS } from "./sessions.js";
+import { getSession, SESSION_TTL_MS } from "./sessions.js";
 import type { User } from "./users.js";
 
 declare global {
@@ -9,6 +9,7 @@ declare global {
     interface Request {
       user?: User;
       sessionToken?: string;
+      readOnly?: boolean;
     }
   }
 }
@@ -38,9 +39,10 @@ export function loadUser(db: Queryable): RequestHandler {
   return async (req, _res, next) => {
     const token = readCookie(req, SESSION_COOKIE);
     if (token) {
-      const user = await getSessionUser(db, token);
-      if (user) {
-        req.user = user;
+      const session = await getSession(db, token);
+      if (session) {
+        req.user = session.user;
+        req.readOnly = session.readOnly;
         req.sessionToken = token;
       }
     }
@@ -51,6 +53,15 @@ export function loadUser(db: Queryable): RequestHandler {
 export function requireUser(req: Request, res: Response, next: NextFunction): void {
   if (!req.user) {
     res.status(401).json({ error: "unauthenticated" });
+    return;
+  }
+  next();
+}
+
+/** For routes that change data: blocks read-only ("Try the demo") sessions. */
+export function requireWritable(req: Request, res: Response, next: NextFunction): void {
+  if (req.readOnly) {
+    res.status(403).json({ error: "read_only_demo", message: "The demo is read-only. Sign up to build your own wardrobe." });
     return;
   }
   next();

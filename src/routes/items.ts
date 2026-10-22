@@ -1,26 +1,30 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
-import { requireUser } from "../auth/middleware.js";
+import { requireUser, requireWritable } from "../auth/middleware.js";
 import multer from "multer";
 import { z } from "zod";
 import type { Queryable } from "../db/pool.js";
 import type { Extractor } from "../extraction/extract.js";
 import { getItem, getItemImage, insertItem, listItems } from "../items/repository.js";
+import { type LimitsConfig, recordCost, reserve } from "../limits/limits.js";
+import { estimateCostUsd } from "../llm/pricing.js";
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 
-export function itemsRouter(deps: { db: Queryable; extractor: Extractor }): Router {
+export function itemsRouter(deps: { db: Queryable; extractor: Extractor; limits: LimitsConfig }): Router {
   const router = Router();
   // req.user is guaranteed by requireUser on every route below.
   router.use("/items", requireUser);
 
-  router.post("/items", upload.single("image"), async (req, res) => {
+  router.post("/items", requireWritable, upload.single("image"), async (req, res) => {
     if (!req.file) {
       res.status(400).json({ error: "missing_image", message: "Send a photo as multipart field 'image'." });
       return;
     }
 
+    const event = await reserve(deps.db, deps.limits, "upload", { userId: req.user!.id, ip: req.ip ?? "0.0.0.0", demo: false });
     const result = await deps.extractor(req.file.buffer);
+    await recordCost(deps.db, event, estimateCostUsd(result.usage));
     // Stores the normalized JPEG (metadata already stripped), not the original upload,
     // in the same row as its attributes, so there's no file to orphan if the insert fails.
     const item = await insertItem(deps.db, req.user!.id, {

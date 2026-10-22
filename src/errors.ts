@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { ErrorRequestHandler } from "express";
 import multer from "multer";
 import { ExtractionError } from "./extraction/errors.js";
+import { LimitError } from "./limits/limits.js";
 
 const EXTRACTION_STATUS = { unsupported_image: 415, refused: 422, invalid_output: 502 } as const;
 
@@ -9,6 +10,10 @@ const EXTRACTION_STATUS = { unsupported_image: 415, refused: 422, invalid_output
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ExtractionError) {
     res.status(EXTRACTION_STATUS[err.code]).json({ error: err.code, message: err.message });
+    return;
+  }
+  if (err instanceof LimitError) {
+    res.status(429).json({ error: err.code, message: err.message });
     return;
   }
   if (err instanceof multer.MulterError) {

@@ -33,6 +33,7 @@ Use "drape" for the repo, package, and database names.
 - Check current Anthropic docs for API shapes rather than relying on memory.
 - Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
 - Every repository function takes a required `userId`; never add an unscoped item query. Agent tools get `userId` from `ToolDeps` (the session), never from tool input. Other users' items return 404, not 403.
+- Model-backed routes call `reserve()` (src/limits) before the model and `recordCost()` after; limits are counted from `usage_events` over 24h, plus a global USD spend cap. Routes that change data use `requireWritable` (blocks read-only demo sessions).
 - Test and eval databases (`drape_test`, `drape_eval`) are dropped and recreated each run.
 - Tests never call the real API: inject a fake `Extractor`/`runAgent` via `createApp` deps, or a scripted `createMessage` into the agent loop.
 - Agent loop history is append-only: push `response.content` back unchanged (thinking blocks included); all tool results for one turn go in a single user message.

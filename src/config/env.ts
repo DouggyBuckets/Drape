@@ -5,6 +5,15 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   ANTHROPIC_API_KEY: z.string().min(1),
+  /** Number of reverse proxies in front of the app, so req.ip is the real client IP. */
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+  // Cost/abuse limits (rolling 24h). See src/limits/limits.ts.
+  LIMIT_UPLOADS_PER_USER: z.coerce.number().int().positive().default(30),
+  LIMIT_OUTFITS_PER_USER: z.coerce.number().int().positive().default(20),
+  LIMIT_DEMO_OUTFITS_PER_IP: z.coerce.number().int().positive().default(5),
+  LIMIT_DEMO_OUTFITS_TOTAL: z.coerce.number().int().positive().default(100),
+  LIMIT_SIGNUPS_PER_IP: z.coerce.number().int().positive().default(5),
+  DAILY_SPEND_CAP_USD: z.coerce.number().positive().default(5),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
