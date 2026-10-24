@@ -7,10 +7,10 @@ Requires Node 22+ and Docker.
 
 ```bash
 cp .env.example .env        # then set ANTHROPIC_API_KEY
-npm install
+npm install && npm --prefix web install
 npm run db:up               # Postgres on localhost:5433
 npm run migrate
-npm run dev                 # http://localhost:3000/health
+npm run dev:all             # API on :3000 + UI on http://localhost:5173
 npm test                    # needs the database running
 ```
 

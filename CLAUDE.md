@@ -35,6 +35,7 @@ Use "drape" for the repo, package, and database names.
 - Every repository function takes a required `userId`; never add an unscoped item query. Agent tools get `userId` from `ToolDeps` (the session), never from tool input. Other users' items return 404, not 403.
 - Model-backed routes call `reserve()` (src/limits) before the model and `recordCost()` after; limits are counted from `usage_events` over 24h, plus a global USD spend cap. Routes that change data use `requireWritable` (blocks read-only demo sessions).
 - Test and eval databases (`drape_test`, `drape_eval`) are dropped and recreated each run.
+- Frontend lives in `web/` (Vite + React + React Router, plain CSS, typed `fetch` client in `web/src/api.ts`). API route prefixes must stay in sync between `web/vite.config.ts` (dev proxy) and `API_PREFIXES` in `src/app.ts`.
 - Tests never call the real API: inject a fake `Extractor`/`runAgent` via `createApp` deps, or a scripted `createMessage` into the agent loop.
 - Agent loop history is append-only: push `response.content` back unchanged (thinking blocks included); all tool results for one turn go in a single user message.
 - Outfit eval grades against each case's EXPECTED temperature/formality, never the agent's own claims. After any prompt/tool change, re-run the full set (not just the case you fixed) to catch regressions.
@@ -45,7 +46,8 @@ Use "drape" for the repo, package, and database names.
 ## Commands
 - `npm run db:up` — start Postgres (host port 5433)
 - `npm run migrate` — apply pending migrations
-- `npm run dev` — run the server with reload
+- `npm run dev` — run the API server with reload; `npm run dev:all` — API + Vite UI (http://localhost:5173)
+- `npm run build` — compile the server and build `web/` (Express serves `web/dist` when it exists)
 - `npm test` — run tests (uses a separate `drape_test` database, created automatically)
 - `npm run create-user -- --email you@x.com [--demo] [--claim-unowned]` — create an account from the CLI (password prompted)
 - `npm run seed -- [--email you@x.com]` — load the fixture wardrobe into a user's wardrobe (default `fixtures@drape.local`; `--reset` removes it; real items untouched)

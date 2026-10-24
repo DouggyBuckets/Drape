@@ -1,4 +1,6 @@
 import { runOutfitAgent } from "./agent/loop.js";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { pool } from "./db/pool.js";
@@ -6,7 +8,11 @@ import { extractAttributes } from "./extraction/extract.js";
 import { anthropic } from "./llm/client.js";
 import { openMeteo } from "./weather/weather.js";
 
+// Same relative path from src/ (tsx) and dist/ (compiled).
+const webDist = fileURLToPath(new URL("../web/dist", import.meta.url));
+
 const app = createApp({
+  ...(existsSync(webDist) ? { webDist } : {}),
   db: pool,
   secureCookies: env.NODE_ENV === "production",
   trustProxy: env.TRUST_PROXY,

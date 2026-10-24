@@ -1,3 +1,4 @@
+import path from "node:path";
 import express from "express";
 import { loadUser, rejectFormPosts } from "./auth/middleware.js";
 import type { Queryable } from "./db/pool.js";
@@ -18,7 +19,11 @@ export interface AppDeps {
   limits: LimitsConfig;
   /** Reverse-proxy hops to trust for req.ip (0 locally). */
   trustProxy?: number;
+  /** Built frontend (web/dist) to serve; omitted in tests and when the UI runs on Vite. */
+  webDist?: string;
 }
+
+const API_PREFIXES = ["/auth", "/items", "/outfits", "/health"];
 
 export function createApp(deps: AppDeps) {
   const app = express();
@@ -30,6 +35,18 @@ export function createApp(deps: AppDeps) {
   app.use(authRouter(deps));
   app.use(itemsRouter(deps));
   app.use(outfitsRouter(deps));
+
+  if (deps.webDist) {
+    const webDist = deps.webDist;
+    app.use(express.static(webDist, { index: false }));
+    // Client-side routes (/wardrobe, /login, ...) all load the single-page app.
+    app.use((req, res, next) => {
+      const isApi = API_PREFIXES.some((p) => req.path === p || req.path.startsWith(`${p}/`));
+      if (req.method !== "GET" || isApi || !req.accepts("html")) return next();
+      res.sendFile(path.join(webDist, "index.html"));
+    });
+  }
+
   app.use(errorHandler);
   return app;
 }
