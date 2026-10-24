@@ -116,6 +116,16 @@ describe("GET /items/:id/image", () => {
   });
 });
 
+describe("DELETE /items/:id", () => {
+  it("deletes the user's own item", async () => {
+    const { agent } = await signedIn();
+    const item = (await upload(agent)).body;
+    expect((await agent.delete(`/items/${item.id}`)).status).toBe(204);
+    expect((await agent.get(`/items/${item.id}`)).status).toBe(404);
+    expect((await agent.delete(`/items/${item.id}`)).status).toBe(404);
+  });
+});
+
 describe("wardrobe isolation", () => {
   it("never shows one user's items to another, and answers 404 rather than 403", async () => {
     const app = testApp();
@@ -126,6 +136,7 @@ describe("wardrobe isolation", () => {
     expect((await bob.agent.get("/items")).body).toEqual([]);
     expect((await bob.agent.get(`/items/${item.id}`)).status).toBe(404);
     expect((await bob.agent.get(`/items/${item.id}/image`)).status).toBe(404);
+    expect((await bob.agent.delete(`/items/${item.id}`)).status).toBe(404);
     expect((await alice.agent.get(`/items/${item.id}/image`)).status).toBe(200);
   });
 });

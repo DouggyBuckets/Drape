@@ -132,3 +132,10 @@ export async function getItem(db: Queryable, userId: string, id: string): Promis
   const { rows } = await db.query<Row>(`SELECT ${COLUMNS} FROM wardrobe_items WHERE user_id = $1 AND id = $2`, [userId, id]);
   return rows[0] ? toItem(rows[0]) : null;
 }
+
+/** Deletes one of the user's items. Returns false if it doesn't exist or isn't theirs. */
+export async function deleteItem(db: Queryable, userId: string, id: string): Promise<boolean> {
+  if (!UUID.test(id)) return false;
+  const { rowCount } = await db.query("DELETE FROM wardrobe_items WHERE user_id = $1 AND id = $2", [userId, id]);
+  return (rowCount ?? 0) > 0;
+}

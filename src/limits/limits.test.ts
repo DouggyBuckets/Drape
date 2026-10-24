@@ -38,6 +38,16 @@ describe("demo account", () => {
     expect(up.body.error).toBe("read_only_demo");
   });
 
+  it("blocks deletes from demo sessions", async () => {
+    const demo = await demoAccount();
+    const { rows } = await pool.query(
+      `INSERT INTO wardrobe_items (user_id, name, category, color, formality, warmth, seasons, extraction_model, extraction)
+       VALUES ($1, 'tee', 'top', 'white', 2, 2, '{summer}', 'fixture', '{}') RETURNING id`, [demo.id]);
+    const visitor = request.agent(appWith());
+    await visitor.post("/auth/demo");
+    expect((await visitor.delete(`/items/${rows[0].id}`)).status).toBe(403);
+  });
+
   it("gives the owner's password login full access to the same account", async () => {
     await demoAccount();
     const owner = request.agent(appWith());

@@ -5,7 +5,7 @@ import multer from "multer";
 import { z } from "zod";
 import type { Queryable } from "../db/pool.js";
 import type { Extractor } from "../extraction/extract.js";
-import { getItem, getItemImage, insertItem, listItems } from "../items/repository.js";
+import { deleteItem, getItem, getItemImage, insertItem, listItems } from "../items/repository.js";
 import { type LimitsConfig, recordCost, reserve } from "../limits/limits.js";
 import { estimateCostUsd } from "../llm/pricing.js";
 
@@ -49,6 +49,11 @@ export function itemsRouter(deps: { db: Queryable; extractor: Extractor; limits:
       return;
     }
     res.json(item);
+  });
+
+  router.delete("/items/:id", requireWritable, async (req, res) => {
+    const deleted = await deleteItem(deps.db, req.user!.id, String(req.params.id));
+    res.status(deleted ? 204 : 404).end();
   });
 
   router.get("/items/:id/image", async (req, res) => {
