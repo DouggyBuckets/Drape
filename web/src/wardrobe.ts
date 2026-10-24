@@ -7,6 +7,10 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   outerwear: "Outerwear", top: "Tops", dress: "Dresses", bottom: "Bottoms", shoes: "Shoes", accessory: "Accessories",
 };
 
+export const CATEGORY_SINGULAR: Record<Category, string> = {
+  outerwear: "Outerwear", top: "Top", dress: "Dress", bottom: "Bottom", shoes: "Shoes", accessory: "Accessory",
+};
+
 export const CATEGORY_ICON: Record<Category, string> = {
   outerwear: "🧥", top: "👕", dress: "👗", bottom: "👖", shoes: "👟", accessory: "🧣",
 };

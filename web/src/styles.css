@@ -129,3 +129,37 @@ input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--acc
   .item-photo { aspect-ratio: 1 / 1; }
   h1 { font-size: 1.5rem; }
 }
+
+/* Outfit page */
+.outfit-page { max-width: 820px; margin: 0 auto; }
+.outfit-page > p { margin-top: 0; }
+.outfit-form { display: grid; gap: 0.6rem; margin-top: 1rem; }
+.outfit-form textarea { resize: vertical; font-size: 1.05rem; }
+.outfit-form-row { display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; }
+.examples { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.75rem; }
+.chip {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.85rem;
+}
+.chip.static { cursor: default; }
+.thinking { animation: pulse 1.6s ease-in-out infinite; margin-top: 1.5rem; }
+
+.result { margin-top: 2rem; display: grid; gap: 1rem; }
+.result-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.outfit-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+.outfit-item {
+  margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow);
+}
+.outfit-item figcaption { padding: 0.5rem 0.65rem 0.65rem; display: grid; gap: 0.1rem; }
+.explanation { font-size: 1.05rem; margin: 0; }
+.warnings { margin: 0; padding: 0.75rem 1rem 0.75rem 2rem; background: var(--warn-bg); color: var(--warn-text); border-radius: 8px; }
+.trace { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; }
+.trace summary { cursor: pointer; font-weight: 600; }
+.trace ol { margin: 0.75rem 0; padding-left: 1.25rem; display: grid; gap: 0.35rem; }
+.trace p { margin: 0; }
+
+@media (max-width: 560px) {
+  .outfit-form-row { grid-template-columns: 1fr; }
+  .outfit-row { grid-template-columns: repeat(2, 1fr); }
+}
