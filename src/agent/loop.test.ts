@@ -148,6 +148,50 @@ describe("runOutfitAgent", () => {
     expect(r.outfit).toBeNull();
   });
 
+  it("emits each trace event as it happens", async () => {
+    const seen: string[] = [];
+    const { createMessage } = scripted([
+      message([text("Looking."), toolUse("search_wardrobe", { category: "top" })]),
+      () => {
+        seen.push("model call 2");
+        return message([submit([ids.top, ids.bottom, ids.shoes, ids.jacket])]);
+      },
+    ]);
+    const r = await runOutfitAgent({ request: "x" }, {
+      ...deps(createMessage),
+      onEvent: (e) => seen.push(e.type === "tool_call" ? e.name : e.type),
+    });
+    expect(seen).toEqual(["text", "search_wardrobe", "model call 2", "submit_outfit"]);
+    expect(r.trace).toHaveLength(3);
+  });
+
+  it("stops before the next model call once aborted", async () => {
+    const controller = new AbortController();
+    const { createMessage, calls } = scripted([message([toolUse("search_wardrobe", {})])]);
+    const r = await runOutfitAgent({ request: "x" }, {
+      ...deps(createMessage),
+      signal: controller.signal,
+      onEvent: () => controller.abort(),
+    });
+    expect(r).toMatchObject({ status: "cancelled", outfit: null, iterations: 1 });
+    expect(calls).toHaveLength(1);
+  });
+
+  it("reports a model call aborted mid-flight as cancelled and passes the signal through", async () => {
+    const controller = new AbortController();
+    let receivedSignal: AbortSignal | undefined;
+    const createMessage: CreateMessage = (_params, options) => {
+      receivedSignal = options?.signal;
+      return new Promise((_resolve, reject) => {
+        options?.signal?.addEventListener("abort", () => reject(new Error("Request was aborted.")));
+        setTimeout(() => controller.abort(), 5);
+      });
+    };
+    const r = await runOutfitAgent({ request: "x" }, { ...deps(createMessage), signal: controller.signal });
+    expect(receivedSignal).toBe(controller.signal);
+    expect(r.status).toBe("cancelled");
+  });
+
   it("sends history back unchanged, including thinking blocks", async () => {
     const thinking = { type: "thinking", thinking: "", signature: "sig-abc" } as unknown as Block;
     const first = message([thinking, toolUse("search_wardrobe", { category: "shoes" })]);

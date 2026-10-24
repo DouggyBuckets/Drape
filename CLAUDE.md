@@ -34,6 +34,7 @@ Use "drape" for the repo, package, and database names.
 - Attribute vocabularies and level definitions live only in `src/extraction/rubric.ts`; the prompt and labeling guide are generated from it. Changing allowed values also needs a new migration for the `wardrobe_items` CHECK constraints.
 - Every repository function takes a required `userId`; never add an unscoped item query. Agent tools get `userId` from `ToolDeps` (the session), never from tool input. Other users' items return 404, not 403.
 - Model-backed routes call `reserve()` (src/limits) before the model and `recordCost()` after; limits are counted from `usage_events` over 24h, plus a global USD spend cap. Routes that change data use `requireWritable` (blocks read-only demo sessions).
+- `/outfits/stream` (SSE): quota/validation errors must happen before `writeHead`, so they stay JSON. The agent gets an `AbortSignal` tied to the client connection; cancelled runs still record their cost.
 - Test and eval databases (`drape_test`, `drape_eval`) are dropped and recreated each run.
 - Frontend lives in `web/` (Vite + React + React Router, plain CSS, typed `fetch` client in `web/src/api.ts`). API route prefixes must stay in sync between `web/vite.config.ts` (dev proxy) and `API_PREFIXES` in `src/app.ts`.
 - Tests never call the real API: inject a fake `Extractor`/`runAgent` via `createApp` deps, or a scripted `createMessage` into the agent loop.

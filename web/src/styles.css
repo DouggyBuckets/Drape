@@ -163,3 +163,11 @@ input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--acc
   .outfit-form-row { grid-template-columns: 1fr; }
   .outfit-row { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Live agent progress */
+.live { margin-top: 1.5rem; }
+.live-steps { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; gap: 0.4rem; }
+.live-steps li { padding-left: 1.6rem; position: relative; animation: fade-in 0.25s ease-out; }
+.live-steps li::before { content: "✓"; position: absolute; left: 0.2rem; color: var(--accent); font-weight: 700; }
+.live .thinking { margin: 0; padding-left: 1.6rem; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(-3px); } }

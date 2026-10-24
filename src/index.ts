@@ -25,12 +25,13 @@ const app = createApp({
     dailySpendCapUsd: env.DAILY_SPEND_CAP_USD,
   },
   extractor: (photo) => extractAttributes(photo),
-  runAgent: (req, userId) =>
+  runAgent: (req, userId, opts) =>
     runOutfitAgent(req, {
+      ...opts,
       db: pool,
       userId,
       weather: openMeteo,
-      createMessage: (params) => anthropic.beta.messages.create(params),
+      createMessage: (params, options) => anthropic.beta.messages.create(params, options),
     }),
 });
 

@@ -1,6 +1,7 @@
-import { type FormEvent, useState } from "react";
-import { type AgentResult, api, ApiError } from "../api";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type AgentResult, ApiError, type TraceEvent } from "../api";
 import { ItemPhoto } from "../components/ItemCard";
+import { streamOutfit } from "../sse";
 import { describeStep } from "../trace";
 import { CATEGORY_SINGULAR, FORMALITY_LABEL, sortHeadToToe } from "../wardrobe";
 
@@ -14,6 +15,7 @@ const FAILURE_MESSAGES: Record<string, string> = {
   max_iterations: "Claude couldn't settle on an outfit within its step limit. Try rephrasing the request.",
   refused: "Claude declined this request.",
   truncated: "The response was cut off. Please try again.",
+  cancelled: "Cancelled.",
 };
 
 export function OutfitPage() {
@@ -22,24 +24,36 @@ export function OutfitPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ data: AgentResult; seconds: number } | null>(null);
+  const [liveSteps, setLiveSteps] = useState<TraceEvent[]>([]);
+  const inFlight = useRef<AbortController | null>(null);
+
+  // Leaving the page cancels the run, which stops the agent (and its spending) server-side.
+  useEffect(() => () => inFlight.current?.abort(), []);
 
   async function build(req: string, loc: string) {
+    inFlight.current?.abort();
+    const controller = new AbortController();
+    inFlight.current = controller;
     setBusy(true);
     setError(null);
     setResult(null);
+    setLiveSteps([]);
     const started = performance.now();
     try {
-      const data = await api<AgentResult>("/outfits", {
-        method: "POST",
-        json: { request: req, ...(loc.trim() ? { location: loc.trim() } : {}) },
-      });
-      setResult({ data, seconds: (performance.now() - started) / 1000 });
+      const data = await streamOutfit(
+        { request: req, ...(loc.trim() ? { location: loc.trim() } : {}) },
+        { signal: controller.signal, onStep: (step) => setLiveSteps((s) => [...s, step]) },
+      );
+      if (data.status === "ok") setResult({ data, seconds: (performance.now() - started) / 1000 });
+      else setError(FAILURE_MESSAGES[data.status] ?? "Claude couldn't build an outfit.");
     } catch (err) {
-      // 422 carries a full agent result explaining why no outfit was produced.
-      if (err instanceof ApiError && err.status === 422) setError(FAILURE_MESSAGES[err.code] ?? err.message);
-      else setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+      if (controller.signal.aborted) return;
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
-      setBusy(false);
+      if (inFlight.current === controller) {
+        inFlight.current = null;
+        setBusy(false);
+      }
     }
   }
 
@@ -92,7 +106,14 @@ export function OutfitPage() {
         ))}
       </div>
 
-      {busy && <p className="muted thinking">Claude is checking the weather and searching your wardrobe… this takes about 15 seconds.</p>}
+      {busy && (
+        <div className="live">
+          <ol className="live-steps">
+            {liveSteps.map((step, i) => <li key={i}>{describeStep(step)}</li>)}
+          </ol>
+          <p className="muted thinking">{liveSteps.length ? "Thinking…" : "Reading your request…"}</p>
+        </div>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
 
       {result && outfit && (

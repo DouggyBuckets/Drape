@@ -40,6 +40,9 @@ The agent is a hand-written tool-use loop (capped at 8 model calls) with four to
 `submit_outfit` rejects item ids that don't exist and invalid slot combinations, so the agent
 can only return real items; warmth and formality problems come back as warnings. The response
 includes the outfit, token usage, and a trace of every tool call.
+`POST /outfits/stream` returns the same result as server-sent events, one `step` per tool call
+as it happens, then `result`. The web UI uses it for live progress; if the client disconnects,
+the agent run is cancelled so no further tokens are spent.
 
 ## Evaluation
 
