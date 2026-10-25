@@ -1,4 +1,6 @@
 # Drape
+
+**Live demo: [drape.fly.dev](https://drape.fly.dev)** (click *Try the demo*, no account needed)
 Drape is a wardrobe-based outfit-building agent. Users photograph clothing items, a vision-capable LLM extracts structured attributes, and an agent builds outfits using only the items in that wardrobe, given a request like "dinner, 45 degrees, smart casual."
 
 ## Getting started
@@ -43,6 +45,20 @@ includes the outfit, token usage, and a trace of every tool call.
 `POST /outfits/stream` returns the same result as server-sent events, one `step` per tool call
 as it happens, then `result`. The web UI uses it for live progress; if the client disconnects,
 the agent run is cancelled so no further tokens are spent.
+
+## Deployment
+
+Runs on [Fly.io](https://fly.io) (one always-on machine) with a [Neon](https://neon.tech) Postgres database.
+
+```bash
+fly secrets set -a drape DATABASE_URL='<neon direct url>' ANTHROPIC_API_KEY='<production key>'
+fly deploy                     # builds the Dockerfile; migrations run as the release command
+DATABASE_URL='<neon url>' npm run create-user -- --email you@example.com --demo   # demo account
+```
+
+Use Neon's **direct** connection string (not the pooled one): the migration runner takes a
+session-level advisory lock, which a transaction-mode pooler doesn't preserve. Production uses a
+separate Anthropic key with a Console spend limit, on top of the app's own daily spend cap.
 
 ## Evaluation
 
