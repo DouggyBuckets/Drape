@@ -111,6 +111,21 @@ attribute (see [eval/LABELING.md](eval/LABELING.md)). Labels are split into a he
 Options: `--labels FILE`, `--effort low|medium|high`, `--limit N`, `--concurrency N`.
 Each run is saved to `eval/results/` with the model, effort, prompt version hash and labels file.
 
-_Results: pending a labeled test set. On the 5-item dev set, category, color and formality are
-100% after fixing the rubric; warmth is 40% exact (100% within ±1), with the labeler consistently
-rating one level warmer than the model._
+**Results** on a held-out test set of 12 photos of my own clothes, labeled before the model saw
+them (`claude-opus-5-5`, effort `low`, about 2¢ per photo):
+
+| Attribute | Exact match | Within ±1 level | Notes |
+|---|---|---|---|
+| category | 100% | | |
+| warmth (1–5) | 92% | 100% | one miss, one level off |
+| color | 83% | | blue vs navy; beige vs "multi" |
+| formality (1–5) | 42% | 100% | model one level lower in 6 of 7 misses |
+| seasons | 25% (exact set) | | mean Jaccard overlap 0.80 |
+
+**What the misses show:** formality and seasons errors are systematic disagreements, not noise.
+Five formality misses are crewneck sweatshirts, which I rated smart casual (3) and the model rated
+casual (2); the rubric lists knit sweaters at 3 and t-shirts at 2 but doesn't place sweatshirts.
+Seven season misses are medium-warmth tops I labeled as wearable in summer and the model didn't;
+the rubric gives examples but no rule for medium-warmth items. These are gaps in the rubric's
+definitions. Fixing them would turn this set into dev data, so the numbers above are reported
+as measured, and a rubric change would need a freshly labeled test set. n = 12 is small.
