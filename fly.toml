@@ -28,7 +28,9 @@ primary_region = 'ord'
     grace_period = '10s'
     interval = '30s'
     method = 'GET'
-    path = '/health'
+    # Liveness only: /health queries Postgres, and polling it every 30s kept Neon from ever
+    # scaling to zero (~180 CU-hours/month). Use /health for manual readiness checks.
+    path = '/livez'
     timeout = '5s'
 
 [[vm]]

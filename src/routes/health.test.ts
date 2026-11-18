@@ -5,6 +5,15 @@ import { testApp } from "../../test/helpers.js";
 
 afterAll(() => pool.end());
 
+describe("GET /livez", () => {
+  it("returns 200 without touching the database", async () => {
+    const db: Queryable = { query: () => Promise.reject(new Error("should not be called")) } as Queryable;
+    const res = await request(testApp({ db })).get("/livez");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ status: "ok" });
+  });
+});
+
 describe("GET /health", () => {
   it("returns 200 when Postgres answers (needs `npm run db:up`)", async () => {
     const res = await request(testApp()).get("/health");
