@@ -1,0 +1,14 @@
+# Test set: labeled before the model saw these photos. Report only these numbers.
+file,category,color,formality,warmth,seasons
+black-barrel-pants.jpg,bottom,black,3,3,fall;spring;winter;summer
+maroon-crewneck.jpg,top,red,3,3,fall;spring;winter;summer
+blue-polo-crewneck.jpg,top,blue,3,3,fall;spring;winter;summer
+maroon-polo.jpg,top,red,3,2,fall;spring;winter;summer
+light-blue-quarter-zip.jpg,top,blue,3,3,fall;spring;winter;summer
+black-lacoste-crewneck.jpg,top,black,3,3,fall;spring;winter;summer
+tan-california-crewneck.jpg,top,beige,3,3,fall;spring;winter;summer
+tan-short-sleeve-button-down.jpg,top,beige,2,2,spring;summer;fall
+khaki-chinos.jpg,bottom,beige,3,3,fall;spring;winter;summer
+white-tennis-shorts.jpg,bottom,white,1,1,fall;spring;summer
+red-tennis-polo.jpg,top,red,2,2,spring;summer;fall
+brown-vneck-sweater.jpg,top,brown,3,3,fall;spring;winter

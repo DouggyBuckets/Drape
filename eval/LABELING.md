@@ -40,7 +40,7 @@ Never copy model answers into a labels file: the eval would then measure the mod
 
 ### color
 One of: black, white, gray, navy, blue, brown, beige, green, red, pink, purple, yellow, orange, multi.
-The single dominant color by visible area. Use 'multi' only when no color covers about half the item (e.g. bold stripes, plaid, florals). Cream/tan/khaki → beige; charcoal → gray; denim blue → blue unless very dark (navy).
+The single dominant color by visible area. Use 'multi' only when no color covers about half the item (e.g. bold stripes, plaid, florals). Cream/tan/khaki → beige; maroon/burgundy → red; charcoal → gray; denim blue → blue unless very dark (navy).
 
 ### formality (1–5)
 - 1: Athletic / lounge — gym wear, sweatpants, slides, graphic hoodies

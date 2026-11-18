@@ -22,7 +22,7 @@ export const CATEGORY_NOTES: Record<(typeof CATEGORIES)[number], string> = {
 
 export const COLOR_NOTES =
   "The single dominant color by visible area. Use 'multi' only when no color covers about half the item " +
-  "(e.g. bold stripes, plaid, florals). Cream/tan/khaki → beige; charcoal → gray; denim blue → blue unless very dark (navy).";
+  "(e.g. bold stripes, plaid, florals). Cream/tan/khaki → beige; maroon/burgundy → red; charcoal → gray; denim blue → blue unless very dark (navy).";
 
 export const FORMALITY_LEVELS: Record<1 | 2 | 3 | 4 | 5, string> = {
   1: "Athletic / lounge — gym wear, sweatpants, slides, graphic hoodies",
