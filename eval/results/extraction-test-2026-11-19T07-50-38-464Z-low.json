@@ -1,0 +1,912 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "promptVersion": "6eef13a2a7a9",
+  "labelsFile": "eval/labels.csv",
+  "ranAt": "2026-11-19T07:50:38.464Z",
+  "usage": {
+    "inputTokens": 80600,
+    "outputTokens": 1349
+  },
+  "estimatedCostUsd": 0.34938,
+  "report": {
+    "total": 20,
+    "failed": 0,
+    "attributes": {
+      "category": {
+        "kind": "categorical",
+        "accuracy": 1
+      },
+      "color": {
+        "kind": "categorical",
+        "accuracy": 0.75
+      },
+      "formality": {
+        "kind": "ordinal",
+        "accuracy": 0.5,
+        "withinOne": 0.95,
+        "meanAbsError": 0.55
+      },
+      "warmth": {
+        "kind": "ordinal",
+        "accuracy": 0.8,
+        "withinOne": 1,
+        "meanAbsError": 0.2
+      },
+      "seasons": {
+        "kind": "set",
+        "accuracy": 0.4,
+        "meanJaccard": 0.8375
+      }
+    },
+    "mismatches": [
+      {
+        "file": "black-barrel-pants.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "maroon-crewneck.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "maroon-crewneck.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "blue-polo-crewneck.jpg",
+        "attribute": "color",
+        "expected": "blue",
+        "predicted": "navy"
+      },
+      {
+        "file": "blue-polo-crewneck.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "blue-polo-crewneck.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "maroon-polo.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      {
+        "file": "light-blue-quarter-zip.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "black-lacoste-crewneck.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "black-lacoste-crewneck.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "tan-california-crewneck.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "tan-california-crewneck.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "tan-short-sleeve-button-down.jpg",
+        "attribute": "color",
+        "expected": "beige",
+        "predicted": "multi"
+      },
+      {
+        "file": "tan-short-sleeve-button-down.jpg",
+        "attribute": "formality",
+        "expected": 2,
+        "predicted": 3
+      },
+      {
+        "file": "white-tennis-shorts.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "summer"
+        ]
+      },
+      {
+        "file": "brown-vneck-sweater.jpg",
+        "attribute": "warmth",
+        "expected": 3,
+        "predicted": 4
+      },
+      {
+        "file": "brown-vneck-sweater.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter"
+        ],
+        "predicted": [
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "black-dress-shoes.jpg",
+        "attribute": "formality",
+        "expected": 5,
+        "predicted": 4
+      },
+      {
+        "file": "blue-adidas-sneakers.jpg",
+        "attribute": "color",
+        "expected": "blue",
+        "predicted": "navy"
+      },
+      {
+        "file": "blue-adidas-sneakers.jpg",
+        "attribute": "warmth",
+        "expected": 2,
+        "predicted": 3
+      },
+      {
+        "file": "brown-dress-shoes.jpg",
+        "attribute": "formality",
+        "expected": 5,
+        "predicted": 3
+      },
+      {
+        "file": "brown-dress-shoes.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "black-gucci-belt.jpg",
+        "attribute": "formality",
+        "expected": 4,
+        "predicted": 3
+      },
+      {
+        "file": "black-gucci-belt.jpg",
+        "attribute": "warmth",
+        "expected": 1,
+        "predicted": 2
+      },
+      {
+        "file": "blue-baggy-jeans.jpg",
+        "attribute": "color",
+        "expected": "blue",
+        "predicted": "navy"
+      },
+      {
+        "file": "blue-baggy-jeans.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      {
+        "file": "black-baggy-jeans.jpg",
+        "attribute": "color",
+        "expected": "black",
+        "predicted": "gray"
+      },
+      {
+        "file": "black-knit-polo.jpg",
+        "attribute": "warmth",
+        "expected": 2,
+        "predicted": 3
+      },
+      {
+        "file": "black-knit-polo.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "summer"
+        ],
+        "predicted": [
+          "spring",
+          "fall"
+        ]
+      },
+      {
+        "file": "green-rugby-shirt.jpg",
+        "attribute": "formality",
+        "expected": 3,
+        "predicted": 2
+      },
+      {
+        "file": "green-rugby-shirt.jpg",
+        "attribute": "seasons",
+        "expected": [
+          "fall",
+          "spring",
+          "summer",
+          "winter"
+        ],
+        "predicted": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      }
+    ],
+    "failures": []
+  },
+  "cases": [
+    {
+      "file": "black-barrel-pants.jpg",
+      "label": {
+        "category": "bottom",
+        "color": "black",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "black wide-leg denim jeans",
+        "category": "bottom",
+        "color": "black",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "maroon-crewneck.jpg",
+      "label": {
+        "category": "top",
+        "color": "red",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "burgundy crewneck fleece sweatshirt",
+        "category": "top",
+        "color": "red",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-polo-crewneck.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "navy Polo Ralph Lauren logo crewneck sweatshirt",
+        "category": "top",
+        "color": "navy",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "maroon-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "red",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "burgundy ribbed knit short-sleeve polo",
+        "category": "top",
+        "color": "red",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "light-blue-quarter-zip.jpg",
+      "label": {
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "light blue cotton knit quarter-zip sweater",
+        "category": "top",
+        "color": "blue",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "black-lacoste-crewneck.jpg",
+      "label": {
+        "category": "top",
+        "color": "black",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "black Lacoste logo crewneck sweatshirt",
+        "category": "top",
+        "color": "black",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "tan-california-crewneck.jpg",
+      "label": {
+        "category": "top",
+        "color": "beige",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "tan crewneck sweatshirt with embroidered California teddy bear",
+        "category": "top",
+        "color": "beige",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "tan-short-sleeve-button-down.jpg",
+      "label": {
+        "category": "top",
+        "color": "beige",
+        "formality": 2,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "brown and cream textured knit short-sleeve button-up polo cardigan",
+        "category": "top",
+        "color": "multi",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "khaki-chinos.jpg",
+      "label": {
+        "category": "bottom",
+        "color": "beige",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "khaki cotton chino trousers",
+        "category": "bottom",
+        "color": "beige",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "white-tennis-shorts.jpg",
+      "label": {
+        "category": "bottom",
+        "color": "white",
+        "formality": 1,
+        "warmth": 1,
+        "seasons": [
+          "fall",
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "white athletic tennis shorts with orange-striped elastic waistband",
+        "category": "bottom",
+        "color": "white",
+        "formality": 1,
+        "warmth": 1,
+        "seasons": [
+          "spring",
+          "summer"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "red-tennis-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "red",
+        "formality": 2,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "red Lacoste Sport performance tennis polo with dark red spray graphic",
+        "category": "top",
+        "color": "red",
+        "formality": 2,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "brown-vneck-sweater.jpg",
+      "label": {
+        "category": "top",
+        "color": "brown",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter"
+        ]
+      },
+      "prediction": {
+        "name": "tan glen plaid wool cricket V-neck sweater",
+        "category": "top",
+        "color": "brown",
+        "formality": 3,
+        "warmth": 4,
+        "seasons": [
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "black-dress-shoes.jpg",
+      "label": {
+        "category": "shoes",
+        "color": "black",
+        "formality": 5,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "black pebbled leather lace-up derby dress shoes",
+        "category": "shoes",
+        "color": "black",
+        "formality": 4,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-adidas-sneakers.jpg",
+      "label": {
+        "category": "shoes",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "prediction": {
+        "name": "navy suede Adidas Handball Spezial sneakers with light blue stripes and gum sole",
+        "category": "shoes",
+        "color": "navy",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "brown-dress-shoes.jpg",
+      "label": {
+        "category": "shoes",
+        "color": "brown",
+        "formality": 5,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "brown leather plain-toe derby shoes",
+        "category": "shoes",
+        "color": "brown",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "black-gucci-belt.jpg",
+      "label": {
+        "category": "accessory",
+        "color": "black",
+        "formality": 4,
+        "warmth": 1,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "black leather belt with gold double-G buckle",
+        "category": "accessory",
+        "color": "black",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "blue-baggy-jeans.jpg",
+      "label": {
+        "category": "bottom",
+        "color": "blue",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "dark wash straight-leg denim jeans",
+        "category": "bottom",
+        "color": "navy",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "black-baggy-jeans.jpg",
+      "label": {
+        "category": "bottom",
+        "color": "black",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "winter",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "faded black wide-leg jeans",
+        "category": "bottom",
+        "color": "gray",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "summer",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "black-knit-polo.jpg",
+      "label": {
+        "category": "top",
+        "color": "black",
+        "formality": 3,
+        "warmth": 2,
+        "seasons": [
+          "fall",
+          "spring",
+          "summer"
+        ]
+      },
+      "prediction": {
+        "name": "black short-sleeve cable-knit polo sweater",
+        "category": "top",
+        "color": "black",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    },
+    {
+      "file": "green-rugby-shirt.jpg",
+      "label": {
+        "category": "top",
+        "color": "green",
+        "formality": 3,
+        "warmth": 3,
+        "seasons": [
+          "fall",
+          "spring",
+          "summer",
+          "winter"
+        ]
+      },
+      "prediction": {
+        "name": "dark green long-sleeve rugby shirt with cream collar and elbow patches",
+        "category": "top",
+        "color": "green",
+        "formality": 2,
+        "warmth": 3,
+        "seasons": [
+          "spring",
+          "fall",
+          "winter"
+        ]
+      },
+      "servedBy": "claude-opus-5-5",
+      "error": null
+    }
+  ]
+}

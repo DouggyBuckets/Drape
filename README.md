@@ -111,21 +111,24 @@ attribute (see [eval/LABELING.md](eval/LABELING.md)). Labels are split into a he
 Options: `--labels FILE`, `--effort low|medium|high`, `--limit N`, `--concurrency N`.
 Each run is saved to `eval/results/` with the model, effort, prompt version hash and labels file.
 
-**Results** on a held-out test set of 12 photos of my own clothes, labeled before the model saw
+**Results** on a held-out test set of 20 photos of my own clothes, labeled before the model saw
 them (`claude-opus-5-5`, effort `low`, about 2¢ per photo):
 
 | Attribute | Exact match | Within ±1 level | Notes |
 |---|---|---|---|
 | category | 100% | | |
-| warmth (1–5) | 92% | 100% | one miss, one level off |
-| color | 83% | | blue vs navy; beige vs "multi" |
-| formality (1–5) | 42% | 100% | model one level lower in 6 of 7 misses |
-| seasons | 25% (exact set) | | mean Jaccard overlap 0.80 |
+| warmth (1–5) | 80% | 100% | every miss is one level off |
+| formality (1–5) | 50% | 95% | model lower in 8 of 10 misses |
+| color | 75% | | 3 of 5 misses are blue vs navy |
+| seasons | 40% (exact set) | | mean Jaccard overlap 0.84 |
 
-**What the misses show:** formality and seasons errors are systematic disagreements, not noise.
+**What the misses show:** most errors are systematic disagreements about definitions, not noise.
 Five formality misses are crewneck sweatshirts, which I rated smart casual (3) and the model rated
 casual (2); the rubric lists knit sweaters at 3 and t-shirts at 2 but doesn't place sweatshirts.
-Seven season misses are medium-warmth tops I labeled as wearable in summer and the model didn't;
-the rubric gives examples but no rule for medium-warmth items. These are gaps in the rubric's
-definitions. Fixing them would turn this set into dev data, so the numbers above are reported
-as measured, and a rubric change would need a freshly labeled test set. n = 12 is small.
+Most season misses are medium-warmth tops I labeled as wearable in summer and the model didn't;
+the rubric gives examples but no rule. Three color misses are blue items the model called navy,
+where the rubric's "very dark → navy" is a judgment call. The one miss by two levels is a pair of
+brown dress shoes rated 3 instead of 5. Fixing the rubric gaps would turn this set into dev data,
+so the numbers are reported as measured; a rubric change needs a freshly labeled test set.
+The model gave identical answers on the 12 items shared with an earlier 12-item run, and adding
+8 items moved several scores by 5–15 points: n = 20 is still small.
